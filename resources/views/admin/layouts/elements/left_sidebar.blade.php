@@ -19,6 +19,25 @@
 				<div data-i18n="Dashboard">Dashboard</div>
 			</a>
 		</li>
+
+		<li class="menu-item {{ request()->routeIs('admin.salesparsonmanagment.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div class="text-truncate" data-i18n="Master">Master</div>
+            </a>
+            <ul class="menu-sub">
+                @foreach([
+                    ['route' => 'admin.salesparsonmanagment.index', 'text' => 'Sales Parson'],
+                ] as $mastermenu)
+                    <li class="menu-item {{ request()->routeIs($mastermenu['route']) ? 'active' : '' }}">
+                        <a href="{{ route($mastermenu['route']) }}" class="menu-link">
+                            <i class="menu-icon tf-icons"></i>
+                            <div data-i18n="{{ $mastermenu['text'] }}">{{ $mastermenu['text'] }}</div>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </li>
 		
 	</ul>
 </aside>

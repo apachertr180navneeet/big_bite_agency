@@ -21,6 +21,21 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
 
+     // Table name (optional, if different from plural model name)
+    protected $table = 'users';
+
+    // Mass assignable fields
+    protected $fillable = [
+        'full_name',
+        'email',
+        'phone',
+        'address',
+        'dob',
+        'alternative_phone',
+        'role',
+        'status'
+    ];
+
     protected $appends = ['avatar_full_path'];
 
     /**
