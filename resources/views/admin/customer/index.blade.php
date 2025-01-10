@@ -3,12 +3,12 @@
     <div class="row">
         <div class="col-md-6 text-start">
             <h5 class="py-2 mb-2">
-                <span class="text-primary fw-light">Sales Parson</span>
+                <span class="text-primary fw-light">Customer</span>
             </h5>
         </div>
         <div class="col-md-6 text-end">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                Add Sales Parson
+                Add Customer
             </button>
         </div>
     </div>
@@ -20,10 +20,10 @@
                         <table class="table table-bordered" id="branchTable">
                             <thead>
                                 <tr>
+                                    <th>Firm Name</th>
                                     <th>Name</th>
                                     <th>Mobile</th>
-                                    <th>Alternative Number</th>
-                                    <th>Email</th>
+                                    <th>Discount Rate (%)</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -46,34 +46,62 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label for="full_name" class="form-label">Name</label>
-                        <input type="text" id="full_name" class="form-control" placeholder="Enter Name" />
+                    <div class="col-md-6 mb-3">
+                        <label for="firm" class="form-label">Firm Name</label>
+                        <input type="text" id="firm" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="phone" class="form-label">Mobile</label>
-                        <input type="text" id="phone" class="form-control" placeholder="Enter Mobile" />
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="text" id="email" class="form-control" placeholder="Enter Email" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="address" class="form-label">Address</label>
-                        <input type="text" id="address" class="form-control" placeholder="Enter Address" />
+                    <div class="col-md-6 mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="text" id="phone" class="form-control" placeholder="Enter Phone" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="dob" class="form-label">DOB</label>
-                        <input type="date" id="dob" class="form-control" placeholder="Enter DOB" />
+                    <div class="col-md-6 mb-3">
+                        <label for="gst" class="form-label">GST No.</label>
+                        <input type="text" id="gst" class="form-control" placeholder="Enter GST No." />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="alternative_phone" class="form-label">Alternative Phone</label>
-                        <input type="text" id="alternative_phone" class="form-control" placeholder="Enter Alternative Phone" />
+                    <div class="col-md-6 mb-3">
+                        <label for="address1" class="form-label">Address 1</label>
+                        <input type="text" id="address1" class="form-control" placeholder="Enter Address 1" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="address2" class="form-label">Address 2</label>
+                        <input type="text" id="address2" class="form-control" placeholder="Enter Address 2" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" id="city" class="form-control" placeholder="Enter City" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" id="state" class="form-control" placeholder="Enter State" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="discount" class="form-label">Discount</label>
+                        <select id="discount" class="form-select">
+                            <option value="">Select Discount</option>
+                            <option value="1">1%</option>
+                            <option value="2">2%</option>
+                            <option value="3">3%</option>
+                            <option value="4">4%</option>
+                            <option value="5">5%</option>
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -96,35 +124,63 @@
 
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-6 mb-3">
                         <input type="hidden" id="compid">
-                        <label for="edit_full_name" class="form-label">Name</label>
-                        <input type="text" id="edit_full_name" class="form-control" placeholder="Enter Name" />
+                        <label for="editfirm" class="form-label">Firm Name</label>
+                        <input type="text" id="editfirm" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_phone" class="form-label">Mobile</label>
-                        <input type="text" id="edit_phone" class="form-control" placeholder="Enter Mobile" />
+                    <div class="col-md-6 mb-3">
+                        <label for="editname" class="form-label">Name</label>
+                        <input type="text" id="editname" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_email" class="form-label">Email</label>
-                        <input type="text" id="edit_email" class="form-control" placeholder="Enter Email" />
+                    <div class="col-md-6 mb-3">
+                        <label for="editemail" class="form-label">Email</label>
+                        <input type="text" id="editemail" class="form-control" placeholder="Enter Email" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_address" class="form-label">Address</label>
-                        <input type="text" id="edit_address" class="form-control" placeholder="Enter Address" />
+                    <div class="col-md-6 mb-3">
+                        <label for="editphone" class="form-label">Phone</label>
+                        <input type="text" id="editphone" class="form-control" placeholder="Enter Phone" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_dob" class="form-label">DOB</label>
-                        <input type="date" id="edit_dob" class="form-control" placeholder="Enter DOB" />
+                    <div class="col-md-6 mb-3">
+                        <label for="editgst" class="form-label">GST No.</label>
+                        <input type="text" id="editgst" class="form-control" placeholder="Enter GST No." />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="edit_alternative_phone" class="form-label">Alternative Phone</label>
-                        <input type="text" id="edit_alternative_phone" class="form-control" placeholder="Enter Alternative Phone" />
+                    <div class="col-md-6 mb-3">
+                        <label for="editaddress1" class="form-label">Address 1</label>
+                        <input type="text" id="editaddress1" class="form-control" placeholder="Enter Address 1" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editaddress2" class="form-label">Address 2</label>
+                        <input type="text" id="editaddress2" class="form-control" placeholder="Enter Address 2" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editcity" class="form-label">City</label>
+                        <input type="text" id="editcity" class="form-control" placeholder="Enter City" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editstate" class="form-label">State</label>
+                        <input type="text" id="editstate" class="form-control" placeholder="Enter State" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="editdiscount" class="form-label">Discount</label>
+                        <select id="editdiscount" class="form-select">
+                            <option value="">Select Discount</option>
+                            <option value="1">1%</option>
+                            <option value="2">2%</option>
+                            <option value="3">3%</option>
+                            <option value="4">4%</option>
+                            <option value="5">5%</option>
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -144,20 +200,20 @@
         const table = $("#branchTable").DataTable({
             processing: true,
             ajax: {
-                url: "{{ route('admin.salesparsonmanagment.getall') }}",
+                url: "{{ route('admin.customer.getall') }}",
             },
             columns: [
                 {
-                    data: "full_name",
+                    data: "firm",
+                },
+                {
+                    data: "name",
                 },
                 {
                     data: "phone",
                 },
                 {
-                    data: "alternative_phone",
-                },
-                {
-                    data: "email",
+                    data: "discount",
                 },
                 {
                     data: "status",
@@ -191,12 +247,16 @@
 
             // Collect form data
             let data = {
-                full_name: $('#full_name').val(),
-                phone: $('#phone').val(),
+                firm: $('#firm').val(),
+                name: $('#name').val(),
                 email: $('#email').val(),
-                address : $('#address').val(),
-                dob : $('#dob').val(),
-                alternative_phone : $('#alternative_phone').val(),
+                phone: $('#phone').val(),
+                gst: $('#gst').val(),
+                address1: $('#address1').val(),
+                address2 : $('#address2').val(),
+                city : $('#city').val(),
+                state : $('#state').val(),
+                discount : $('#discount').val(),
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
             };
 
@@ -205,7 +265,7 @@
             $('.error-text').text('');
 
             $.ajax({
-                url: '{{ route('admin.salesparsonmanagment.store') }}', // Adjust the route as necessary
+                url: '{{ route('admin.customer.store') }}', // Adjust the route as necessary
                 type: 'POST',
                 data: data,
                 success: function(response) {
@@ -236,26 +296,30 @@
 
         // Define editUser function
         function editUser(userId) {
-            const url = '{{ route("admin.salesparsonmanagment.get", ":userid") }}'.replace(":userid", userId);
+            const url = '{{ route("admin.customer.get", ":userid") }}'.replace(":userid", userId);
             $.ajax({
                 url: url, // Update this URL to match your route
                 method: 'GET',
                 success: function(data) {
                     // Populate modal fields with the retrieved data
                     $('#compid').val(data.id);
-                    $('#edit_full_name').val(data.full_name);
-                    $('#edit_phone').val(data.phone);
-                    $('#edit_email').val(data.email);
-                    $('#edit_address').val(data.address);
-                    $('#edit_dob').val(data.dob);
-                    $('#edit_alternative_phone').val(data.alternative_phone);
+                    $('#editfirm').val(data.firm);
+                    $('#editname').val(data.name);
+                    $('#editemail').val(data.email);
+                    $('#editphone').val(data.phone);
+                    $('#editgst').val(data.gst);
+                    $('#editaddress1').val(data.address1);
+                    $('#editaddress2').val(data.address2);
+                    $('#editcity').val(data.city);
+                    $('#editstate').val(data.state);
+                    $('#editdiscount').val(data.discount);
 
                     // Open the modal
                     $('#editModal').modal('show');
-                    setFlash("success", 'Sales Parson found successfully.');
+                    setFlash("success", 'Customer found successfully.');
                 },
                 error: function(xhr) {
-                    setFlash("error", "Sales Parson not found. Please try again later.");
+                    setFlash("error", "Customer not found. Please try again later.");
                 }
             });
         }
@@ -264,19 +328,24 @@
         $('#EditComapany').on('click', function() {
             const userId = $('#compid').val(); // Ensure userId is available in the scope
             $.ajax({
-                url: '{{ route('admin.salesparsonmanagment.update') }}', // Update this URL to match your route
+                url: '{{ route('admin.customer.update') }}', // Update this URL to match your route
                 method: 'POST',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
-                    full_name: $('#edit_full_name').val(),
-                    email: $('#edit_email').val(),
-                    phone: $('#edit_phone').val(),
-                    alternative_phone: $('#edit_alternative_phone').val(),
-                    dob: $('#edit_dob').val(),
-                    address: $('#edit_address').val(),
+                    firm: $('#editfirm').val(),
+                    name: $('#editname').val(),
+                    email: $('#editemail').val(),
+                    phone: $('#editphone').val(),
+                    gst: $('#editgst').val(),
+                    address1: $('#editaddress1').val(),
+                    address2: $('#editaddress2').val(),
+                    city: $('#editcity').val(),
+                    state: $('#editstate').val(),
+                    discount: $('#editdiscount').val(),
                     id: userId // Ensure userId is in scope or adjust accordingly
                 },
                 success: function(response) {
+                    console.log(response);
                     if (response.success == 'true') {
                         // Optionally, refresh the page or update the table with new data
                         //table.ajax.reload();
@@ -286,7 +355,7 @@
                         table.ajax.reload(); // Reload DataTable
                     } else {
                         for (let field in response.errors) {
-                            let $field = $(`#edit_${field}`);
+                            let $field = $(`#edit${field}`);
                             if ($field.length) {
                                 $field.siblings('.error-text').text(response.errors[field][0]);
                             }
@@ -294,7 +363,7 @@
                     }
                 },
                 error: function(xhr) {
-                    console.error('Error updating Branch data:', xhr);
+                    console.error('Error updating Customer data:', xhr);
                 }
             });
         });
@@ -315,7 +384,7 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "POST",
-                        url: "{{ route('admin.salesparsonmanagment.status') }}",
+                        url: "{{ route('admin.customer.status') }}",
                         data: { userId, status, _token: $('meta[name="csrf-token"]').attr('content') },
                         success: function (response) {
                             console.log(response);
@@ -349,7 +418,7 @@
                 confirmButtonText: "Yes",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const url = '{{ route("admin.salesparsonmanagment.destroy", ":userId") }}'.replace(":userId", userId);
+                    const url = '{{ route("admin.customer.destroy", ":userId") }}'.replace(":userId", userId);
                     $.ajax({
                         type: "DELETE",
                         url,

@@ -20,7 +20,7 @@
 			</a>
 		</li>
 
-		<li class="menu-item {{ request()->routeIs('admin.salesparsonmanagment.*') ? 'active open' : '' }}">
+		<li class="menu-item {{ request()->routeIs('admin.salesparsonmanagment.*') || request()->routeIs('admin.customer.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div class="text-truncate" data-i18n="Master">Master</div>
@@ -28,6 +28,7 @@
             <ul class="menu-sub">
                 @foreach([
                     ['route' => 'admin.salesparsonmanagment.index', 'text' => 'Sales Parson'],
+					['route' => 'admin.customer.index', 'text' => 'Customer'],
                 ] as $mastermenu)
                     <li class="menu-item {{ request()->routeIs($mastermenu['route']) ? 'active' : '' }}">
                         <a href="{{ route($mastermenu['route']) }}" class="menu-link">

@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\{
-    User,
+    Customer,
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
 
-class SalesparsonmanagmentController extends Controller
+class CustomerController extends Controller
 {
     /**
      * Display the User index page.
@@ -22,11 +22,9 @@ class SalesparsonmanagmentController extends Controller
     {
         $user = Auth::user();
 
-        $compId = $user->firm_id;
-
-        $location = User::where('role','user')->orderBy('id', 'desc')->get();
+        $location = Customer::orderBy('id', 'desc')->get();
         // Pass the company and comId to the view
-        return view('admin.salesparson.index', compact('location'));
+        return view('admin.customer.index', compact('location'));
     }
 
     /**
@@ -39,8 +37,7 @@ class SalesparsonmanagmentController extends Controller
     {
         $user = Auth::user();
 
-        $saleparson = User::where('role', 'salesparson')
-        ->get();
+        $saleparson = Customer::get();
 
         return response()->json(['data' => $saleparson]);
     }
@@ -54,7 +51,7 @@ class SalesparsonmanagmentController extends Controller
     public function status(Request $request)
     {
         try {
-            $User = User::findOrFail($request->userId);
+            $User = Customer::findOrFail($request->userId);
             $User->status = $request->status;
             $User->save();
 
@@ -73,7 +70,7 @@ class SalesparsonmanagmentController extends Controller
     public function destroy($id)
     {
         try {
-            User::where('id', $id)->delete();
+            Customer::where('id', $id)->delete();
 
             return response()->json([
                 'success' => true,
@@ -91,12 +88,16 @@ class SalesparsonmanagmentController extends Controller
     {
         // Validation rules
         $rules = [
-            'full_name' => 'required|string',
-            'phone' => 'required|unique:users,phone',
-            'email' => 'required|unique:users,email',
-            'address' => 'required',
-            'dob' => 'required',
-            'alternative_phone' => 'required|unique:users,alternative_phone',
+            'name' => 'required|string',
+            'firm' => 'required|unique:customers,firm',
+            'phone' => 'required|unique:customers,phone',
+            'email' => 'required|unique:customers,email',
+            'gst' => 'required|unique:customers,gst',
+            'address1' => 'required',
+            'address2' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'discount' => 'required',
         ];
 
         // Validate the request data
@@ -114,23 +115,28 @@ class SalesparsonmanagmentController extends Controller
         $compId = $user->firm_id;
         // Save the User data
         $dataUser = [
-            'full_name' => $request->full_name,
-            'phone' => $request->phone,
+            'name' => $request->name,
+            'firm' => $request->firm,
             'email' => $request->email,
-            'address' => $request->address,
-            'alternative_phone' => $request->alternative_phone,
+            'phone' => $request->phone,
+            'gst' => $request->gst,
+            'address1' => $request->address1,
+            'address2' => $request->address2,
+            'city' => $request->city,
+            'state' => $request->state,
+            'discount' => $request->discount,
         ];
-        User::create($dataUser);
+        Customer::create($dataUser);
         return response()->json([
             'success' => true,
-            'message' => 'Sales Parson saved successfully!',
+            'message' => 'Customer saved successfully!',
         ]);
     }
 
     // Fetch user data
     public function get($id)
     {
-        $user = User::find($id);
+        $user = Customer::find($id);
         return response()->json($user);
     }
 
@@ -138,22 +144,29 @@ class SalesparsonmanagmentController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'id' => 'required|integer|exists:users,id', // Adjust as needed
-            'full_name' => 'required|string',
-            'phone'  => [
+            'id' => 'required|integer|exists:customers,id', // Adjust as needed
+            'name' => 'required|string',
+            'firm'  => [
                 'required',
-                Rule::unique('users', 'phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
+                Rule::unique('customers', 'firm')->ignore($request->id), // Ensure firm is unique, ignoring the current record
             ],
             'email'  => [
                 'required',
-                Rule::unique('users', 'email')->ignore($request->id), // Ensure account number is unique, ignoring the current record
+                Rule::unique('customers', 'email')->ignore($request->id), // Ensure email is unique, ignoring the current record
             ],
-            'address' => 'required',
-            'dob' => 'required',
-            'alternative_phone'  => [
+            'phone'  => [
                 'required',
-                Rule::unique('users', 'alternative_phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
+                Rule::unique('customers', 'phone')->ignore($request->id), // Ensure phone is unique, ignoring the current record
             ],
+            'gst'  => [
+                'required',
+                Rule::unique('customers', 'gst')->ignore($request->id), // Ensure GST is unique, ignoring the current record
+            ],
+            'address1' => 'required',
+            'address2' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'discount' => 'required',
         ];
 
         // Validate the request data
@@ -166,12 +179,12 @@ class SalesparsonmanagmentController extends Controller
             ]);
         }
 
-        $user = User::find($request->id);
+        $user = Customer::find($request->id);
         if ($user) {
             $user->update($request->all());
-            return response()->json(['success' => true , 'message' => 'Branch Update Successfully']);
+            return response()->json(['success' => true , 'message' => 'Customer Update Successfully']);
         }
 
-        return response()->json(['success' => false, 'message' => 'Branch not found']);
+        return response()->json(['success' => false, 'message' => 'Customer not found']);
     }
 }
