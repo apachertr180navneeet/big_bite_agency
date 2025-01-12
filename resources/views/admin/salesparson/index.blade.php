@@ -277,7 +277,8 @@
                     id: userId // Ensure userId is in scope or adjust accordingly
                 },
                 success: function(response) {
-                    if (response.success == 'true') {
+                    console.log(response.success);
+                    if (response.success == true) {
                         // Optionally, refresh the page or update the table with new data
                         //table.ajax.reload();
                         setFlash("success", response.message);

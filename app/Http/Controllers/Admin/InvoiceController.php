@@ -6,13 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\{
+    Customer,
     User,
+    Invoice
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
-class SalesparsonmanagmentController extends Controller
+class InvoiceController extends Controller
 {
     /**
      * Display the User index page.
@@ -21,13 +23,30 @@ class SalesparsonmanagmentController extends Controller
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
+        // Get only the current date
+        $currentDate = Carbon::now()->toDateString();
 
-        $compId = $user->firm_id;
+        // Get the last invoice
+        $lastInvoice = Invoice::latest('invoice')->first();
 
-        $location = User::where('role','user')->orderBy('id', 'desc')->get();
-        // Pass the company and comId to the view
-        return view('admin.salesparson.index', compact('location'));
+        if ($lastInvoice) {
+            // Increment the last invoice number
+            $newInvoice = $lastInvoice->invoice + 1;
+        } else {
+            // Start with 1 if no invoices exist
+            $newInvoice = 1;
+        }
+
+        // Format the invoice number with leading zeros (4 digits)
+        $formattedInvoice = str_pad($newInvoice, 4, '0', STR_PAD_LEFT);
+
+        $customers = Customer::where('status','active')->get();
+
+        $salesparsons = User::where('status','active')->where('role','salesparson')->get();
+
+
+        // Pass the data to the view
+        return view('admin.invoice.index', compact('currentDate', 'formattedInvoice','customers','salesparsons'));
     }
 
     /**
@@ -40,7 +59,9 @@ class SalesparsonmanagmentController extends Controller
     {
         $user = Auth::user();
 
-        $saleparson = User::where('role', 'salesparson')
+        $saleparson = Invoice::join('customers', 'invoices.customer', '=', 'customers.id')
+        ->join('users', 'invoices.assign', '=', 'users.id')
+        ->select('invoices.*', 'customers.name as customers_name' , 'users.full_name as assign_name')
         ->get();
 
         return response()->json(['data' => $saleparson]);
@@ -55,7 +76,7 @@ class SalesparsonmanagmentController extends Controller
     public function status(Request $request)
     {
         try {
-            $User = User::findOrFail($request->userId);
+            $User = Invoice::findOrFail($request->userId);
             $User->status = $request->status;
             $User->save();
 
@@ -74,7 +95,7 @@ class SalesparsonmanagmentController extends Controller
     public function destroy($id)
     {
         try {
-            User::where('id', $id)->delete();
+            Invoice::where('id', $id)->delete();
 
             return response()->json([
                 'success' => true,
@@ -92,12 +113,11 @@ class SalesparsonmanagmentController extends Controller
     {
         // Validation rules
         $rules = [
-            'full_name' => 'required|string',
-            'phone' => 'required|unique:users,phone',
-            'email' => 'required|unique:users,email',
-            'address' => 'required',
-            'dob' => 'required',
-            'alternative_phone' => 'required|unique:users,alternative_phone',
+            'date' => 'required|string',
+            'invoice' => 'required|unique:users,phone',
+            'customer' => 'required',
+            'assign' => 'required',
+            'amount' => 'required',
         ];
 
         // Validate the request data
@@ -115,24 +135,23 @@ class SalesparsonmanagmentController extends Controller
         $compId = $user->firm_id;
         // Save the User data
         $dataUser = [
-            'full_name' => $request->full_name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'address' => $request->address,
-            'dob' => $request->dob,
-            'alternative_phone' => $request->alternative_phone,
+            'date' => $request->date,
+            'invoice' => $request->invoice,
+            'customer' => $request->customer,
+            'assign' => $request->assign,
+            'amount' => $request->amount,
         ];
-        User::create($dataUser);
+        Invoice::create($dataUser);
         return response()->json([
             'success' => true,
-            'message' => 'Sales Parson saved successfully!',
+            'message' => 'Invoice saved successfully!',
         ]);
     }
 
     // Fetch user data
     public function get($id)
     {
-        $user = User::find($id);
+        $user = Invoice::find($id);
         return response()->json($user);
     }
 
@@ -168,7 +187,7 @@ class SalesparsonmanagmentController extends Controller
             ]);
         }
 
-        $user = User::find($request->id);
+        $user = Invoice::find($request->id);
         if ($user) {
             $user->update($request->all());
             return response()->json(['success' => true , 'message' => 'Branch Update Successfully']);

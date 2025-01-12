@@ -3,12 +3,12 @@
     <div class="row">
         <div class="col-md-6 text-start">
             <h5 class="py-2 mb-2">
-                <span class="text-primary fw-light">Customer</span>
+                <span class="text-primary fw-light">Invoice</span>
             </h5>
         </div>
         <div class="col-md-6 text-end">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                Add Customer
+                Add Invoice
             </button>
         </div>
     </div>
@@ -20,10 +20,10 @@
                         <table class="table table-bordered" id="branchTable">
                             <thead>
                                 <tr>
-                                    <th>Firm Name</th>
-                                    <th>Name</th>
-                                    <th>Mobile</th>
-                                    <th>Discount Rate (%)</th>
+                                    <th>Date</th>
+                                    <th>Invoice</th>
+                                    <th>Customer Nmae</th>
+                                    <th>Assign To</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -41,67 +41,44 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Sales Parson Add</h5>
+                <h5 class="modal-title" id="exampleModalLabel1">Invoice Add</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="firm" class="form-label">Firm Name</label>
-                        <input type="text" id="firm" class="form-control" placeholder="Enter Name" />
+                    <div class="col-md-12 mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="text" id="date" value="{{ $currentDate }}" class="form-control" placeholder="Enter Date" readonly />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" id="name" class="form-control" placeholder="Enter Name" />
+                    <div class="col-md-12 mb-3">
+                        <label for="invoice" class="form-label">Invoice No.</label>
+                        <input type="text" id="invoice" class="form-control" value="{{ $formattedInvoice }}" placeholder="Enter Invoice No." readonly />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="text" id="email" class="form-control" placeholder="Enter Email" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="phone" class="form-label">Phone</label>
-                        <input type="text" id="phone" class="form-control" placeholder="Enter Phone" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="gst" class="form-label">GST No.</label>
-                        <input type="text" id="gst" class="form-control" placeholder="Enter GST No." />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="address1" class="form-label">Address 1</label>
-                        <input type="text" id="address1" class="form-control" placeholder="Enter Address 1" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="address2" class="form-label">Address 2</label>
-                        <input type="text" id="address2" class="form-control" placeholder="Enter Address 2" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <input type="text" id="city" class="form-control" placeholder="Enter City" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="state" class="form-label">State</label>
-                        <input type="text" id="state" class="form-control" placeholder="Enter State" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label for="discount" class="form-label">Discount</label>
-                        <select id="discount" class="form-select">
-                            <option value="">Select Discount</option>
-                            <option value="1">1%</option>
-                            <option value="2">2%</option>
-                            <option value="3">3%</option>
-                            <option value="4">4%</option>
-                            <option value="5">5%</option>
+                    <div class="col-md-12 mb-3">
+                        <label for="customer" class="form-label">Customer Name</label>
+                        <select id="customer" class="form-select">
+                            <option value="">Select Customer</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                            @endforeach
                         </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="assign" class="form-label">Sales Parson Name</label>
+                        <select id="assign" class="form-select">
+                            <option value="">Select Sales Parson</option>
+                            @foreach ($salesparsons as $salesparson)
+                                <option value="{{ $salesparson->id }}">{{ $salesparson->full_name }}</option>
+                            @endforeach
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <input type="text" id="amount" class="form-control" placeholder="Enter Amount"/>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -118,69 +95,46 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Sales Parson Edit</h5>
+                <h5 class="modal-title" id="exampleModalLabel1">Invoice Edit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-12 mb-3">
                         <input type="hidden" id="compid">
-                        <label for="editfirm" class="form-label">Firm Name</label>
-                        <input type="text" id="editfirm" class="form-control" placeholder="Enter Name" />
+                        <label for="editdate" class="form-label">Date</label>
+                        <input type="text" id="editdate" value="{{ $currentDate }}" class="form-control" placeholder="Enter Date" readonly />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editname" class="form-label">Name</label>
-                        <input type="text" id="editname" class="form-control" placeholder="Enter Name" />
+                    <div class="col-md-12 mb-3">
+                        <label for="editinvoice" class="form-label">Invoice No.</label>
+                        <input type="text" id="editinvoice" class="form-control" value="{{ $formattedInvoice }}" placeholder="Enter Invoice No." readonly />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editemail" class="form-label">Email</label>
-                        <input type="text" id="editemail" class="form-control" placeholder="Enter Email" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editphone" class="form-label">Phone</label>
-                        <input type="text" id="editphone" class="form-control" placeholder="Enter Phone" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editgst" class="form-label">GST No.</label>
-                        <input type="text" id="editgst" class="form-control" placeholder="Enter GST No." />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editaddress1" class="form-label">Address 1</label>
-                        <input type="text" id="editaddress1" class="form-control" placeholder="Enter Address 1" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editaddress2" class="form-label">Address 2</label>
-                        <input type="text" id="editaddress2" class="form-control" placeholder="Enter Address 2" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editcity" class="form-label">City</label>
-                        <input type="text" id="editcity" class="form-control" placeholder="Enter City" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editstate" class="form-label">State</label>
-                        <input type="text" id="editstate" class="form-control" placeholder="Enter State" />
-                        <small class="error-text text-danger"></small>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label for="editdiscount" class="form-label">Discount</label>
-                        <select id="editdiscount" class="form-select">
-                            <option value="">Select Discount</option>
-                            <option value="1">1%</option>
-                            <option value="2">2%</option>
-                            <option value="3">3%</option>
-                            <option value="4">4%</option>
-                            <option value="5">5%</option>
+                    <div class="col-md-12 mb-3">
+                        <label for="editcustomer" class="form-label">Customer Name</label>
+                        <select id="editcustomer" class="form-select">
+                            <option value="">Select Customer</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                            @endforeach
                         </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="editassign" class="form-label">Sales Parson Name</label>
+                        <select id="editassign" class="form-select">
+                            <option value="">Select Sales Parson</option>
+                            @foreach ($salesparsons as $salesparson)
+                                <option value="{{ $salesparson->id }}">{{ $salesparson->full_name }}</option>
+                            @endforeach
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="editamount" class="form-label">Amount</label>
+                        <input type="text" id="editamount" class="form-control" placeholder="Enter Amount"/>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -200,20 +154,23 @@
         const table = $("#branchTable").DataTable({
             processing: true,
             ajax: {
-                url: "{{ route('admin.customer.getall') }}",
+                url: "{{ route('admin.invoice.getall') }}",
             },
             columns: [
                 {
-                    data: "firm",
+                    data: "date",
                 },
                 {
-                    data: "name",
+                    data: "invoice",
                 },
                 {
-                    data: "phone",
+                    data: "customers_name",
                 },
                 {
-                    data: "discount",
+                    data: "assign_name",
+                },
+                {
+                    data: "amount",
                 },
                 {
                     data: "status",
@@ -247,16 +204,11 @@
 
             // Collect form data
             let data = {
-                firm: $('#firm').val(),
-                name: $('#name').val(),
-                email: $('#email').val(),
-                phone: $('#phone').val(),
-                gst: $('#gst').val(),
-                address1: $('#address1').val(),
-                address2 : $('#address2').val(),
-                city : $('#city').val(),
-                state : $('#state').val(),
-                discount : $('#discount').val(),
+                date: $('#date').val(),
+                invoice: $('#invoice').val(),
+                customer: $('#customer').val(),
+                assign: $('#assign').val(),
+                amount: $('#amount').val(),
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
             };
 
@@ -265,7 +217,7 @@
             $('.error-text').text('');
 
             $.ajax({
-                url: '{{ route('admin.customer.store') }}', // Adjust the route as necessary
+                url: '{{ route('admin.invoice.store') }}', // Adjust the route as necessary
                 type: 'POST',
                 data: data,
                 success: function(response) {
@@ -296,30 +248,25 @@
 
         // Define editUser function
         function editUser(userId) {
-            const url = '{{ route("admin.customer.get", ":userid") }}'.replace(":userid", userId);
+            const url = '{{ route("admin.invoice.get", ":userid") }}'.replace(":userid", userId);
             $.ajax({
                 url: url, // Update this URL to match your route
                 method: 'GET',
                 success: function(data) {
                     // Populate modal fields with the retrieved data
                     $('#compid').val(data.id);
-                    $('#editfirm').val(data.firm);
-                    $('#editname').val(data.name);
-                    $('#editemail').val(data.email);
-                    $('#editphone').val(data.phone);
-                    $('#editgst').val(data.gst);
-                    $('#editaddress1').val(data.address1);
-                    $('#editaddress2').val(data.address2);
-                    $('#editcity').val(data.city);
-                    $('#editstate').val(data.state);
-                    $('#editdiscount').val(data.discount);
+                    $('#editdate').val(data.date);
+                    $('#editinvoice').val(data.invoice);
+                    $('#editcustomer').val(data.customer);
+                    $('#editassign').val(data.assign);
+                    $('#editamount').val(data.amount);
 
                     // Open the modal
                     $('#editModal').modal('show');
-                    setFlash("success", 'Customer found successfully.');
+                    setFlash("success", 'Invoice found successfully.');
                 },
                 error: function(xhr) {
-                    setFlash("error", "Customer not found. Please try again later.");
+                    setFlash("error", "Invoice not found. Please try again later.");
                 }
             });
         }
@@ -328,7 +275,7 @@
         $('#EditComapany').on('click', function() {
             const userId = $('#compid').val(); // Ensure userId is available in the scope
             $.ajax({
-                url: '{{ route('admin.customer.update') }}', // Update this URL to match your route
+                url: '{{ route('admin.invoice.update') }}', // Update this URL to match your route
                 method: 'POST',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
@@ -346,7 +293,7 @@
                 },
                 success: function(response) {
                     console.log(response);
-                    if (response.success == true) {
+                    if (response.success == 'true') {
                         // Optionally, refresh the page or update the table with new data
                         //table.ajax.reload();
                         setFlash("success", response.message);
@@ -363,14 +310,14 @@
                     }
                 },
                 error: function(xhr) {
-                    console.error('Error updating Customer data:', xhr);
+                    console.error('Error updating Invoice data:', xhr);
                 }
             });
         });
 
         // Update user status
         function updateUserStatus(userId, status) {
-            const message = status === "active" ? "Sales Parson will be able to log in after activation." : "Sales Parson will not be able to log in after deactivation.";
+            const message = status === "active" ? "Invoice will be able to log in after activation." : "Invoice will not be able to log in after deactivation.";
 
             Swal.fire({
                 title: "Are you sure?",
@@ -384,12 +331,12 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "POST",
-                        url: "{{ route('admin.customer.status') }}",
+                        url: "{{ route('admin.invoice.status') }}",
                         data: { userId, status, _token: $('meta[name="csrf-token"]').attr('content') },
                         success: function (response) {
                             console.log(response);
                             if (response.success == true) {
-                                const successMessage = status === "active" ? "Sales Parson activated successfully." : "Sales Parson deactivated successfully.";
+                                const successMessage = status === "active" ? "Invoice activated successfully." : "Invoice deactivated successfully.";
                                 setFlash("success", successMessage);
                             } else {
                                 setFlash("error", "There was an issue changing the status. Please contact your system administrator.");
@@ -418,7 +365,7 @@
                 confirmButtonText: "Yes",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const url = '{{ route("admin.customer.destroy", ":userId") }}'.replace(":userId", userId);
+                    const url = '{{ route("admin.invoice.destroy", ":userId") }}'.replace(":userId", userId);
                     $.ajax({
                         type: "DELETE",
                         url,
