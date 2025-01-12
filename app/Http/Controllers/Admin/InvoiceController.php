@@ -23,22 +23,6 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        // Get only the current date
-        $currentDate = Carbon::now()->toDateString();
-
-        // Get the last invoice
-        $lastInvoice = Invoice::latest('invoice')->first();
-
-        if ($lastInvoice) {
-            // Increment the last invoice number
-            $newInvoice = $lastInvoice->invoice + 1;
-        } else {
-            // Start with 1 if no invoices exist
-            $newInvoice = 1;
-        }
-
-        // Format the invoice number with leading zeros (4 digits)
-        $formattedInvoice = str_pad($newInvoice, 4, '0', STR_PAD_LEFT);
 
         $customers = Customer::where('status','active')->get();
 
@@ -46,7 +30,7 @@ class InvoiceController extends Controller
 
 
         // Pass the data to the view
-        return view('admin.invoice.index', compact('currentDate', 'formattedInvoice','customers','salesparsons'));
+        return view('admin.invoice.index', compact('customers','salesparsons'));
     }
 
     /**
@@ -114,7 +98,7 @@ class InvoiceController extends Controller
         // Validation rules
         $rules = [
             'date' => 'required|string',
-            'invoice' => 'required|unique:users,phone',
+            'invoice' => 'required|unique:invoices,invoice',
             'customer' => 'required',
             'assign' => 'required',
             'amount' => 'required',
@@ -159,22 +143,14 @@ class InvoiceController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'id' => 'required|integer|exists:users,id', // Adjust as needed
-            'full_name' => 'required|string',
-            'phone'  => [
+            'date' => 'required|string',
+            'invoice'  => [
                 'required',
-                Rule::unique('users', 'phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
+                Rule::unique('invoices', 'invoice')->ignore($request->id), // Ensure account number is unique, ignoring the current record
             ],
-            'email'  => [
-                'required',
-                Rule::unique('users', 'email')->ignore($request->id), // Ensure account number is unique, ignoring the current record
-            ],
-            'address' => 'required',
-            'dob' => 'required',
-            'alternative_phone'  => [
-                'required',
-                Rule::unique('users', 'alternative_phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
-            ],
+            'customer' => 'required',
+            'assign' => 'required',
+            'amount' => 'required',
         ];
 
         // Validate the request data
@@ -190,9 +166,9 @@ class InvoiceController extends Controller
         $user = Invoice::find($request->id);
         if ($user) {
             $user->update($request->all());
-            return response()->json(['success' => true , 'message' => 'Branch Update Successfully']);
+            return response()->json(['success' => true , 'message' => 'Invoice Update Successfully']);
         }
 
-        return response()->json(['success' => false, 'message' => 'Branch not found']);
+        return response()->json(['success' => false, 'message' => 'Invoice not found']);
     }
 }

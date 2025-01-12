@@ -48,12 +48,12 @@
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label for="date" class="form-label">Date</label>
-                        <input type="text" id="date" value="{{ $currentDate }}" class="form-control" placeholder="Enter Date" readonly />
+                        <input type="date" id="date"class="form-control" placeholder="Enter Date"/>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="invoice" class="form-label">Invoice No.</label>
-                        <input type="text" id="invoice" class="form-control" value="{{ $formattedInvoice }}" placeholder="Enter Invoice No." readonly />
+                        <input type="text" id="invoice" class="form-control" placeholder="Enter Invoice No."/>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -104,12 +104,12 @@
                     <div class="col-md-12 mb-3">
                         <input type="hidden" id="compid">
                         <label for="editdate" class="form-label">Date</label>
-                        <input type="text" id="editdate" value="{{ $currentDate }}" class="form-control" placeholder="Enter Date" readonly />
+                        <input type="text" id="editdate"class="form-control" placeholder="Enter Date"/>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="editinvoice" class="form-label">Invoice No.</label>
-                        <input type="text" id="editinvoice" class="form-control" value="{{ $formattedInvoice }}" placeholder="Enter Invoice No." readonly />
+                        <input type="text" id="editinvoice" class="form-control" placeholder="Enter Invoice No."/>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -279,21 +279,15 @@
                 method: 'POST',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
-                    firm: $('#editfirm').val(),
-                    name: $('#editname').val(),
-                    email: $('#editemail').val(),
-                    phone: $('#editphone').val(),
-                    gst: $('#editgst').val(),
-                    address1: $('#editaddress1').val(),
-                    address2: $('#editaddress2').val(),
-                    city: $('#editcity').val(),
-                    state: $('#editstate').val(),
-                    discount: $('#editdiscount').val(),
+                    date: $('#editdate').val(),
+                    invoice: $('#editinvoice').val(),
+                    customer: $('#editcustomer').val(),
+                    assign: $('#editassign').val(),
+                    amount: $('#editamount').val(),
                     id: userId // Ensure userId is in scope or adjust accordingly
                 },
                 success: function(response) {
-                    console.log(response);
-                    if (response.success == 'true') {
+                    if (response.success == true) {
                         // Optionally, refresh the page or update the table with new data
                         //table.ajax.reload();
                         setFlash("success", response.message);

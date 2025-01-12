@@ -121,6 +121,7 @@ class SalesparsonmanagmentController extends Controller
             'address' => $request->address,
             'dob' => $request->dob,
             'alternative_phone' => $request->alternative_phone,
+            "password" => Hash::make($request->phone),
         ];
         User::create($dataUser);
         return response()->json([
@@ -170,7 +171,16 @@ class SalesparsonmanagmentController extends Controller
 
         $user = User::find($request->id);
         if ($user) {
-            $user->update($request->all());
+            $dataUser = [
+                'full_name' => $request->full_name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'address' => $request->address,
+                'dob' => $request->dob,
+                'alternative_phone' => $request->alternative_phone,
+                "password" => Hash::make($request->phone),
+            ];
+            $user->update($dataUser);
             return response()->json(['success' => true , 'message' => 'Branch Update Successfully']);
         }
 
