@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Invoice extends Model
+class Receipt extends Model
 {
     use HasFactory;
 
@@ -14,16 +14,16 @@ class Invoice extends Model
 
 
     // Table name (optional, if different from plural model name)
-    protected $table = 'invoices';
+    protected $table = 'receipts';
 
     // Mass assignable fields
     protected $fillable = [
         'date',
-        'invoice',
-        'customer',
-        'assign',
+        'receipt',
+        'bill_id',
         'amount',
-        'payment',
+        'discount',
+        'manager_status',
         'status',
     ];
 

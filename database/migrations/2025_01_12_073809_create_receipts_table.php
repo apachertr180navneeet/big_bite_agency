@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invoices', function (Blueprint $table) {
+        Schema::create('receipts', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->string('invoice')->unique();
-            $table->BigInteger('customer');
-            $table->BigInteger('assign');
+            $table->string('receipt')->unique();
+            $table->BigInteger('bill_id');
             $table->string('amount');
+            $table->string('discount');
+            $table->enum('full_payment',['yes','no'])->default('no');
+            $table->enum('manager_status',['active','inactive'])->default('active');
             $table->enum('status',['active','inactive'])->default('active');
-            $table->enum('payment',['done','pending'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoices');
+        Schema::dropIfExists('receipts');
     }
 };

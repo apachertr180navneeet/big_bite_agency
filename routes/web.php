@@ -87,7 +87,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Master Route
         // Resource Management Routes (Variation, Tax, Item, Vendor, Customer)
-        foreach (['salesparsonmanagment','customer','invoice'] as $resource) {
+        foreach (['salesparsonmanagment','customer','invoice','receipt'] as $resource) {
             Route::prefix($resource)->name("$resource.")->group(function () use ($resource) {
                 $controller = "App\Http\Controllers\Admin\\" . ucfirst($resource) . "Controller";
                 Route::get('/', [$controller, 'index'])->name('index');
@@ -97,6 +97,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::delete('delete/{id}', [$controller, 'destroy'])->name('destroy');
                 Route::get('get/{id}', [$controller, 'get'])->name('get');
                 Route::post('update', [$controller, 'update'])->name('update');
+                if($resource == 'receipt'){
+                    Route::post('detail', [$controller, 'detail'])->name('detail');
+                }
             });
         }
     });
