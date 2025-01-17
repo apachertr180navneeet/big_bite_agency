@@ -1,4 +1,7 @@
 @extends('admin.layouts.app') @section('style') @endsection @section('content')
+@php
+    $user = auth()->user();
+@endphp
 <div class="container-fluid flex-grow-1 container-p-y">
     <div class="row">
         <div class="col-md-6 text-start">
@@ -50,19 +53,19 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="date" class="form-label">Date</label>
                         <input type="date" id="date"class="form-control" placeholder="Enter Date"/>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="invoice" class="form-label">Receipt No.</label>
-                        <input type="text" id="invoice" class="form-control" placeholder="Enter Receipt No."/>
+                    <div class="col-md-6 mb-3">
+                        <label for="receipt" class="form-label">Receipt No.</label>
+                        <input type="text" id="receipt" class="form-control" placeholder="Enter Receipt No."/>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="invoice" class="form-label">Bill No.</label>
-                        <select id="invoice" class="form-select">
+                    <div class="col-md-6 mb-3">
+                        <label for="bill_id" class="form-label">Bill No.</label>
+                        <select id="bill_id" class="form-select">
                             <option value="">Select Invoice</option>
                             @foreach ($invoices as $invoice)
                                 <option value="{{ $invoice->id }}">{{ $invoice->invoice }}</option>
@@ -70,24 +73,47 @@
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="customer" class="form-label">Customer</label>
                         <input type="text" id="customer" class="form-control" placeholder="Enter customer"/>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="amount" class="form-label">Amount</label>
                         <input type="text" id="amount" class="form-control" placeholder="Enter Amount"/>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="discount" class="form-label">Discount</label>
                         <input type="text" id="discount" class="form-control" placeholder="Enter Discount"/>
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="final_amount" class="form-label">Final Amount</label>
+                        <input type="text" id="final_amount" class="form-control" placeholder="Enter Final Amount"/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="given_amount" class="form-label">Given Amount</label>
+                        <input type="text" id="given_amount" class="form-control" placeholder="Enter Given Amount"/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="remaing_amount" class="form-label">Remaing Amount</label>
+                        <input type="text" id="remaing_amount" class="form-control" placeholder="Enter Remaing Amount"/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
                         <label for="sales_parson" class="form-label">Sales Parson</label>
                         <input type="text" id="sales_parson" class="form-control" placeholder="Enter Sales Parson"/>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="full_payment" class="form-label">Full Payment</label>
+                        <select id="full_payment" class="form-select">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
                 </div>
@@ -158,15 +184,80 @@
 
 @endsection @section('script')
 <script>
-    $(document).on('change', '#invoice', function () {
+    $(document).on('change', '#bill_id', function () {
         const selectedInvoiceId = $(this).val();
-
         if (selectedInvoiceId) {
-
-        }else{
+            const url = '{{ route("admin.receipt.detail") }}';
+            let data = {
+                id: selectedInvoiceId,
+                _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
+            };
+            $.ajax({
+                url: url, // Update this URL to match your route
+                method: 'POST',
+                data: data,
+                success: function (data) {
+                    console.log(data);
+                    var discount = parseFloat(data.customers_discount) || 0; // Discount percentage (e.g., 2 for 2%)
+                    var amount = parseFloat(data.amount) || 0; // Amount (e.g., 1500000)
+                    var givenamount = parseFloat(data.receipts_amount) || 0;
+    
+                    // Calculate the discount amount
+                    var discountAmount = (discount / 100) * amount;
+    
+                    // Round the discount amount to 2 decimal places
+                    discountAmount = discountAmount.toFixed(2);
+    
+                    // Calculate the final amount after applying the discount
+                    var finalAmount = amount - discountAmount;
+    
+                    // Ensure the given amount does not exceed the final amount
+                    if (givenamount > finalAmount) {
+                        alert("Given amount cannot exceed the final amount!");
+                        givenamount = finalAmount; // Adjust the given amount to the final amount
+                    }
+    
+                    // Calculate the remaining amount
+                    var remainingAmount = finalAmount - givenamount;
+    
+                    // Set values in the form fields
+                    $('#customer').val(data.customers_name);
+                    $('#sales_parson').val(data.assign_name);
+                    $('#amount').val(data.amount);
+                    $('#discount').val(discountAmount); // Use the rounded discount amount here
+                    $('#final_amount').val(finalAmount);
+                    $('#given_amount').val(givenamount);
+                    $('#remaing_amount').val(remainingAmount);
+                },
+                error: function (xhr) {
+                    setFlash("error", "Invoice not found. Please try again later.");
+                }
+            });
+        } else {
             alert('No Value selected');
         }
-    });        
+    });
+    
+    // Listen for changes in the given_amount field
+    $(document).on('input', '#given_amount', function () {
+        var givenamount = parseFloat($(this).val()) || 0;  // Get the updated given amount from the input field
+        var finalAmount = parseFloat($('#final_amount').val()) || 0;  // Get the final amount
+    
+        // Ensure the given amount does not exceed the final amount
+        if (givenamount > finalAmount) {
+            alert("Given amount cannot exceed the final amount!");
+            givenamount = finalAmount;  // Adjust the given amount to the final amount
+            $(this).val(givenamount);   // Update the input field with the adjusted value
+        }
+    
+        // Calculate the remaining amount
+        var remainingAmount = finalAmount - givenamount;
+    
+        // Update the remaining amount field
+        $('#remaing_amount').val(remainingAmount);
+    });
+    
+           
     $(document).ready(function () {
         // Initialize DataTable
         const table = $("#branchTable").DataTable({
@@ -200,8 +291,8 @@
                     data: "manager_status",
                     render: (data, type, row) => {
                         const statusBadge = row.manager_status === "active" ?
-                            '<span class="badge bg-label-success me-1">Active</span>' :
-                            '<span class="badge bg-label-danger me-1">Inactive</span>';
+                            '<span class="badge bg-label-success me-1">Recived</span>' :
+                            '<span class="badge bg-label-danger me-1">Pending</span>';
                         return statusBadge;
                     },
                 },
@@ -209,18 +300,23 @@
                     data: "status",
                     render: (data, type, row) => {
                         const statusBadge = row.status === "active" ?
-                            '<span class="badge bg-label-success me-1">Active</span>' :
-                            '<span class="badge bg-label-danger me-1">Inactive</span>';
+                            '<span class="badge bg-label-success me-1">Recived</span>' :
+                            '<span class="badge bg-label-danger me-1">Pending</span>';
                         return statusBadge;
                     },
                 },
                 {
                     data: "action",
                     render: (data, type, row) => {
-                        const statusButton = row.status === "inactive"
-                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Activate</button>`
-                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Deactivate</button>`;
-
+                        @if ($user->role == 'admin')
+                            const statusButton = row.status === "inactive"
+                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
+                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Pending</button>`;
+                        @else
+                            const statusButton = row.manager_status === "inactive"
+                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateMangaerStatus(${row.id}, 'active')">Recived</button>`
+                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateMangaerStatus(${row.id}, 'inactive')">Pending</button>`;
+                        @endif
                         //const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
                         const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
 
@@ -238,10 +334,12 @@
             // Collect form data
             let data = {
                 date: $('#date').val(),
-                invoice: $('#invoice').val(),
-                customer: $('#customer').val(),
-                assign: $('#assign').val(),
-                amount: $('#amount').val(),
+                receipt: $('#receipt').val(),
+                bill_id: $('#bill_id').val(),
+                amount: $('#given_amount').val(),
+                discount: $('#discount').val(),
+                remaing_amount: $('#remaing_amount').val(),
+                full_payment: $('#full_payment').val(),
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
             };
 
@@ -380,6 +478,43 @@
             });
         };
 
+        function updateMangaerStatus(userId, status) {
+            const message = status === "active" ? "Invoice will be able to log in after activation." : "Invoice will not be able to log in after deactivation.";
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: message,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Okay",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ route('admin.receipt.manager.status') }}",
+                        data: { userId, status, _token: $('meta[name="csrf-token"]').attr('content') },
+                        success: function (response) {
+                            console.log(response);
+                            if (response.success == true) {
+                                const successMessage = status === "active" ? "Invoice activated successfully." : "Invoice deactivated successfully.";
+                                setFlash("success", successMessage);
+                            } else {
+                                setFlash("error", "There was an issue changing the status. Please contact your system administrator.");
+                            }
+                            table.ajax.reload(); // Reload DataTable
+                        },
+                        error: function () {
+                            setFlash("error", "There was an issue processing your request. Please try again later.");
+                        },
+                    });
+                } else {
+                    table.ajax.reload(); // Reload DataTable
+                }
+            });
+        };
+
         // Delete user
         function deleteUser(userId) {
             Swal.fire({
@@ -423,6 +558,7 @@
 
         // Expose functions to global scope
         window.updateUserStatus = updateUserStatus;
+        window.updateMangaerStatus = updateMangaerStatus;
         window.deleteUser = deleteUser;
         window.editUser = editUser;
     });

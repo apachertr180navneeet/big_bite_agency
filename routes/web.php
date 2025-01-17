@@ -99,6 +99,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::post('update', [$controller, 'update'])->name('update');
                 if($resource == 'receipt'){
                     Route::post('detail', [$controller, 'detail'])->name('detail');
+                    Route::post('managerStatus', [$controller, 'managerStatus'])->name('manager.status');
                 }
             });
         }

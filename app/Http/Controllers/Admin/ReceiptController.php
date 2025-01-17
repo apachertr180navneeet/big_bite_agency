@@ -74,6 +74,20 @@ class ReceiptController extends Controller
         }
     }
 
+
+    public function managerStatus(Request $request)
+    {
+        try {
+            $User = Receipt::findOrFail($request->userId);
+            $User->manager_status = $request->status;
+            $User->save();
+
+            return response()->json(['success' => true]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
     /**
      * Delete a User by its ID.
      *
@@ -102,10 +116,12 @@ class ReceiptController extends Controller
         // Validation rules
         $rules = [
             'date' => 'required|string',
-            'invoice' => 'required|unique:invoices,invoice',
-            'customer' => 'required',
-            'assign' => 'required',
+            'receipt' => 'required|unique:receipts,receipt',
+            'bill_id' => 'required',
             'amount' => 'required',
+            'discount' => 'required',
+            'full_payment' => 'required',
+            'remaing_amount' => 'required',
         ];
 
         // Validate the request data
@@ -124,15 +140,18 @@ class ReceiptController extends Controller
         // Save the User data
         $dataUser = [
             'date' => $request->date,
-            'invoice' => $request->invoice,
-            'customer' => $request->customer,
+            'receipt' => $request->receipt,
+            'bill_id' => $request->bill_id,
             'assign' => $request->assign,
             'amount' => $request->amount,
+            'discount' => $request->discount,
+            'full_payment' => $request->full_payment,
+            'remaing_amount' => $request->remaing_amount,
         ];
         Receipt::create($dataUser);
         return response()->json([
             'success' => true,
-            'message' => 'Invoice saved successfully!',
+            'message' => 'Receipt saved successfully!',
         ]);
     }
 
@@ -174,5 +193,17 @@ class ReceiptController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Invoice not found']);
+    }
+
+    // Get invoice details
+    public function detail(Request $request){
+        $id = $request->id;
+        $invoice = Invoice::where('invoices.id', $id)
+            ->join('users', 'invoices.assign', '=', 'users.id')
+            ->join('customers', 'invoices.customer', '=', 'customers.id')
+            ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id')
+            ->select('invoices.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id' , 'receipts.amount as receipts_amount' , 'receipts.remaing_amount as remaing_amount', 'invoices.assign as assign_id', 'customers.name as customers_name' , 'customers.discount as customers_discount' , 'users.full_name as assign_name')
+            ->first();
+        return response()->json($invoice);
     }
 }

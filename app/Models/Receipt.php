@@ -23,6 +23,8 @@ class Receipt extends Model
         'bill_id',
         'amount',
         'discount',
+        'full_payment',
+        'remaing_amount',
         'manager_status',
         'status',
     ];

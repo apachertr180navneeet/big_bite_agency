@@ -2,9 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ContactController;
-use App\Http\Controllers\Api\UserController;
+
+use App\Http\Controllers\Api\{
+    AuthController,
+    ContactController,
+    UserController,
+    CustomerController
+};
 
 
 
@@ -43,5 +47,7 @@ Route::middleware('jwt.verify')->group(function() {
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);     
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
+
+    Route::get('/customer/list', [CustomerController::class, 'customerList']);
     
 });
