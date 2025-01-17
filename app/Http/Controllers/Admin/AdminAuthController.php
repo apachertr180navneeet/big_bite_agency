@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Models\{
+    User,
+    Customer,
+    Invoice
+};
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Mail, DB, Hash, Validator, Session, File,Exception;
@@ -266,7 +270,49 @@ class AdminAuthController extends Controller
 
     public function adminDashboard()
     {
-        return view("admin.dashboard.index");
+        // Common date references
+        $today = Carbon::today();
+        $now = Carbon::now();
+        $currentMonth = $now->month;
+        $currentYear = $now->year;
+
+        // Retrieve customer and salesperson counts grouped by status
+        $counts = [
+            'customers' => Customer::selectRaw("
+                SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_count,
+                SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive_count
+            ")->first(),
+            'salespersons' => User::selectRaw("
+                SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_count,
+                SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive_count
+            ")->where('role', 'salesparson')->first(),
+        ];
+
+        // Calculate totals
+        $totalUserActive = $counts['customers']->active_count + $counts['salespersons']->active_count;
+        $totalUserInactive = $counts['customers']->inactive_count + $counts['salespersons']->inactive_count;
+
+        // Retrieve invoice counts
+        $invoiceCounts = [
+            'totalBill' => Invoice::count(),
+            'today' => Invoice::whereBetween('created_at', [$now->subDays(10), $now])->count(),
+            'currentMonth' => Invoice::whereMonth('created_at', $currentMonth)
+                ->whereYear('created_at', $currentYear)
+                ->count(),
+        ];
+
+        // Pass data to the view
+        return view("admin.dashboard.index", [
+            'customerActiveCount' => $counts['customers']->active_count,
+            'customerInactiveCount' => $counts['customers']->inactive_count,
+            'salesparsonActiveCount' => $counts['salespersons']->active_count,
+            'salesparsonInactiveCount' => $counts['salespersons']->inactive_count,
+            'totalUserActive' => $totalUserActive,
+            'totalUserInactive' => $totalUserInactive,
+            'todayCount' => $invoiceCounts['today'],
+            'currentMonthCount' => $invoiceCounts['currentMonth'],
+            'totalBill'=> $invoiceCounts['totalBill'],
+        ]);
     }
 
 

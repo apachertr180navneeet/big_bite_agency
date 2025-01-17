@@ -14,7 +14,7 @@
                     <div class="col-sm-12">
                         <div class="card-body text-center">
                             <h3 class="fw-medium d-block mb-1">Total Customer</h3>
-                            <p class="card-title mb-2">Active - 10 || In-Active - 10</p>
+                            <p class="card-title mb-2">Active - {{ $customerActiveCount }} || In-Active - {{ $customerInactiveCount }}</p>
                         </div>
                     </div>
                 </div>
@@ -28,15 +28,15 @@
                             <div class="row">
                                 <div class="col-md-4 text-center">
                                     <h3 class="fw-medium d-block mb-1">Total Bills</h3>
-                                    <p class="card-title mb-2">Total - 10</p>
+                                    <p class="card-title mb-2">Total - {{ $totalBill }}</p>
                                 </div>
                                 <div class="col-md-4 text-center">
                                     <h3 class="fw-medium d-block mb-1">Today Bills</h3>
-                                    <p class="card-title mb-2">Total - 10</p>
+                                    <p class="card-title mb-2">Total - {{ $todayCount }}</p>
                                 </div>
                                 <div class="col-md-4 text-center">
                                     <h3 class="fw-medium d-block mb-1">Month Bills</h3>
-                                    <p class="card-title mb-2">Total - 10</p>
+                                    <p class="card-title mb-2">Total - {{ $currentMonthCount }}</p>
                                 </div>
                             </div>
                         </div>
@@ -53,7 +53,7 @@
                     <div class="col-sm-12">
                         <div class="card-body text-center">
                             <h3 class="fw-medium d-block mb-1">Total User</h3>
-                            <p class="card-title mb-2">Active - 10 || In-Active - 10</p>
+                            <p class="card-title mb-2">Active - {{ $totalUserActive }} || In-Active - {{ $totalUserInactive }}</p>
                         </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                     <div class="card">
                         <div class="card-body text-center">
                             <h3 class="fw-medium d-block mb-1">Total Sales Person</h3>
-                            <p class="card-title mb-2">Active - 10 || In-Active - 10</p>
+                            <p class="card-title mb-2">Active - {{ $salesparsonActiveCount }} || In-Active - {{ $salesparsonInactiveCount }}</p>
                         </div>
                     </div>
                 </div>
