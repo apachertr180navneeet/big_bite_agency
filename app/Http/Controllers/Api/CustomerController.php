@@ -32,10 +32,10 @@ class CustomerController extends Controller
                 ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id')
                 ->select(
                     'invoices.id',
-                    'receipts.remaing_amount as remaing_amount',
                     'customers.name as customers_name',
                     'customers.city as customers_city',
                     'customers.phone as customers_phone',
+                    DB::raw('COALESCE(receipts.remaing_amount, invoices.amount) as due')
                 )
                 ->paginate($perPage);
 
@@ -54,7 +54,7 @@ class CustomerController extends Controller
                     'customers_name' => $invoice->customers_name,
                     'customers_city' => $invoice->customers_city,
                     'customers_phone' => $invoice->customers_phone,
-                    'due' => $invoice->remaing_amount,
+                    'due' => $invoice->due, // This will contain either remaining_amount or invoice amount
                 ];
             });
 
