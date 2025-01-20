@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 
 use App\Models\{
     Customer,
-    State
+    State,
+    Invoice,
+    Receipt
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
@@ -190,5 +192,56 @@ class CustomerController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Customer not found']);
+    }
+
+    public function lager($id)
+    {
+        $user = Auth::user();
+
+        $invoiceLists = Invoice::where('customer', $id)->get();
+
+        $ledgerData = []; // To store the merged and sorted data
+        $totalInvoice = 0; // To calculate the total invoice amount
+        $totalReceipt = 0; // To calculate the total receipt amount
+
+        foreach ($invoiceLists as $invoiceValue) {
+            // Add invoice data
+            $ledgerData[] = [
+                'date' => $invoiceValue->date,
+                'description' => $invoiceValue->invoice,
+                'bill' => $invoiceValue->amount,
+                'receipt' => '0',
+            ];
+
+            // Update the total invoice amount
+            $totalInvoice += $invoiceValue->amount;
+
+            // Fetch related receipts
+            $receiptLists = Receipt::where('bill_id', $invoiceValue->id)->get();
+            foreach ($receiptLists as $receiptValue) {
+                $ledgerData[] = [
+                    'date' => $receiptValue->date,
+                    'description' => $receiptValue->receipt,
+                    'bill' => '0',
+                    'receipt' => $receiptValue->amount,
+                ];
+
+                // Update the total receipt amount
+                $totalReceipt += $receiptValue->amount;
+            }
+        }
+
+        // Sort the ledger data by date
+        usort($ledgerData, function ($a, $b) {
+            return strtotime($a['date']) - strtotime($b['date']);
+        });
+
+        // Calculate the total due
+        $totalDue = $totalInvoice - $totalReceipt;
+
+        
+
+        // Pass the ledger data and totals to the view
+        return view('admin.customer.leger', compact('ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue'));
     }
 }

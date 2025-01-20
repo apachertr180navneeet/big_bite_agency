@@ -101,6 +101,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     Route::post('detail', [$controller, 'detail'])->name('detail');
                     Route::post('managerStatus', [$controller, 'managerStatus'])->name('manager.status');
                 }
+                if($resource == 'customer'){
+                    Route::get('lager/{id}', [$controller, 'lager'])->name('lager');
+                }
             });
         }
     });

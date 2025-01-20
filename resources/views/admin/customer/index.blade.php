@@ -207,6 +207,7 @@
 <script>
     $(document).ready(function () {
         // Initialize DataTable
+        const baseUrl = "{{ route('admin.customer.lager', ['id' => ':id']) }}";
         const table = $("#branchTable").DataTable({
             processing: true,
             ajax: {
@@ -244,7 +245,9 @@
                         //const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
                         const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
 
-                        return `${statusButton} ${editButton}`;
+                        const viewLeger = `<a href="${baseUrl.replace(':id', row.id)}" class="btn btn-sm btn-success">Lager</a>`;
+
+                        return `${statusButton} ${editButton} ${viewLeger}`;
                     },
                 },
 
