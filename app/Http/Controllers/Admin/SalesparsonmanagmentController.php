@@ -94,21 +94,23 @@ class SalesparsonmanagmentController extends Controller
         $rules = [
             'full_name' => 'required|string',
             'phone' => 'required|unique:users,phone',
-            'email' => 'required|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
             'address' => 'required',
-            'dob' => 'required',
-            'alternative_phone' => 'required|unique:users,alternative_phone',
+            'password' => 'required|string|min:8',
+            'dob' => 'nullable|date',
+            'alternative_phone' => 'nullable|unique:users,alternative_phone',
         ];
-
+        
         // Validate the request data
         $validator = Validator::make($request->all(), $rules);
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
             ]);
         }
+        
 
         $user = Auth::user();
 
@@ -121,7 +123,7 @@ class SalesparsonmanagmentController extends Controller
             'address' => $request->address,
             'dob' => $request->dob,
             'alternative_phone' => $request->alternative_phone,
-            "password" => Hash::make($request->phone),
+            "password" => Hash::make($request->password),
         ];
         User::create($dataUser);
         return response()->json([
@@ -148,13 +150,14 @@ class SalesparsonmanagmentController extends Controller
                 Rule::unique('users', 'phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
             ],
             'email'  => [
-                'required',
+                'nullable',
                 Rule::unique('users', 'email')->ignore($request->id), // Ensure account number is unique, ignoring the current record
             ],
             'address' => 'required',
-            'dob' => 'required',
+            'password' => 'nullable|string|min:8',
+            'dob' => 'nullable',
             'alternative_phone'  => [
-                'required',
+                'nullable',
                 Rule::unique('users', 'alternative_phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
             ],
         ];

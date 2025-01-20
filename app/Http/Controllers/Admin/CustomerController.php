@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\{
     Customer,
+    State
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
@@ -24,8 +25,10 @@ class CustomerController extends Controller
         $user = Auth::user();
 
         $location = Customer::orderBy('id', 'desc')->get();
+
+        $states = State::orderBy('state_id', 'asc')->get();
         // Pass the company and comId to the view
-        return view('admin.customer.index', compact('location'));
+        return view('admin.customer.index', compact('location','states'));
     }
 
     /**
@@ -92,13 +95,13 @@ class CustomerController extends Controller
             'name' => 'required|string',
             'firm' => 'required|unique:customers,firm',
             'phone' => 'required|unique:customers,phone',
-            'email' => 'required|unique:customers,email',
+            'email' => 'nullable|email|unique:customers,email',
             'gst' => 'required|unique:customers,gst',
             'address1' => 'required',
-            'address2' => 'required',
+            'address2' => 'nullable|string',
             'city' => 'required',
-            'state' => 'required',
-            'discount' => 'required',
+            'state' => 'required|string',
+            'discount' => 'required|numeric',
         ];
 
         // Validate the request data
@@ -152,7 +155,7 @@ class CustomerController extends Controller
                 Rule::unique('customers', 'firm')->ignore($request->id), // Ensure firm is unique, ignoring the current record
             ],
             'email'  => [
-                'required',
+                'nullable',
                 Rule::unique('customers', 'email')->ignore($request->id), // Ensure email is unique, ignoring the current record
             ],
             'phone'  => [
@@ -164,7 +167,7 @@ class CustomerController extends Controller
                 Rule::unique('customers', 'gst')->ignore($request->id), // Ensure GST is unique, ignoring the current record
             ],
             'address1' => 'required',
-            'address2' => 'required',
+            'address2' => 'nullable',
             'city' => 'required',
             'state' => 'required',
             'discount' => 'required',

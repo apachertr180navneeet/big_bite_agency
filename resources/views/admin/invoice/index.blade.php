@@ -57,7 +57,11 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="customer" class="form-label">Customer Name</label>
+                        <label for="customer" class="form-label">Customer Name 
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModalCustomer">
+                                Add Customer
+                            </button>
+                        </label>
                         <select id="customer" class="form-select">
                             <option value="">Select Customer</option>
                             @foreach ($customers as $customer)
@@ -142,6 +146,88 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="EditComapany">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addModalCustomer" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel1">Customer Add</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firm" class="form-label">Firm Name</label>
+                        <input type="text" id="firm" class="form-control" placeholder="Enter Name" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter Name" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" id="email" class="form-control" placeholder="Enter Email" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="text" id="phone" class="form-control" placeholder="Enter Phone" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="gst" class="form-label">GST No.</label>
+                        <input type="text" id="gst" class="form-control" placeholder="Enter GST No." />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="address1" class="form-label">Address 1</label>
+                        <input type="text" id="address1" class="form-control" placeholder="Enter Address 1" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="address2" class="form-label">Address 2</label>
+                        <input type="text" id="address2" class="form-control" placeholder="Enter Address 2" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" id="city" class="form-control" placeholder="Enter City" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <select id="state" class="form-select">
+                            <option value="">Select State</option>
+                            @foreach ($states as $state)
+                                <option value="{{ $state->state_name }}">{{ $state->state_name }}</option>
+                            @endforeach
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="discount" class="form-label">Discount</label>
+                        <select id="discount" class="form-select">
+                            <option value="0">0%</option>
+                            <option value="1">1%</option>
+                            <option value="2">2%</option>
+                            <option value="3">3%</option>
+                            <option value="4">4%</option>
+                            <option value="5">5%</option>
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="AddCustomer">Save</button>
             </div>
         </div>
     </div>
@@ -379,6 +465,62 @@
                 }
             });
         };
+
+        // Handle form submission via AJAX
+        $('#AddCustomer').click(function(e) {
+            e.preventDefault();
+
+            // Collect form data
+            let data = {
+                firm: $('#firm').val(),
+                name: $('#name').val(),
+                email: $('#email').val(),
+                phone: $('#phone').val(),
+                gst: $('#gst').val(),
+                address1: $('#address1').val(),
+                address2 : $('#address2').val(),
+                city : $('#city').val(),
+                state : $('#state').val(),
+                discount : $('#discount').val(),
+                _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
+            };
+
+
+            // Clear previous validation error messages
+            $('.error-text').text('');
+
+            $.ajax({
+                url: '{{ route('admin.customer.store') }}', // Adjust the route as necessary
+                type: 'POST',
+                data: data,
+                success: function(response) {
+                    if (response.success) {
+                        setFlash("success", response.message);
+                        $('#addModal').modal('hide'); // Close the modal
+                        $('#addModal').find('input, textarea, select').val(''); // Reset form fields
+                        table.ajax.reload(); // Reload DataTable
+                        location.reload();
+                        $('#addModalCustomer').modal('hide'); // Show the modal
+                        $('#addModal').modal('show'); // Show the modal
+                    } else {
+                        // Display validation errors
+                        if (response.errors) {
+                            for (let field in response.errors) {
+                                let $field = $(`#${field}`);
+                                if ($field.length) {
+                                    $field.siblings('.error-text').text(response.errors[field][0]);
+                                }
+                            }
+                        } else {
+                            setFlash("error", response.message);
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    setFlash("error", "An unexpected error occurred.");
+                }
+            });
+        });
 
          // Flash message function using Toast.fire
          function setFlash(type, message) {

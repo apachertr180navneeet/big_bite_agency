@@ -41,7 +41,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Sales Parson Add</h5>
+                <h5 class="modal-title" id="exampleModalLabel1">Customer Add</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -88,14 +88,19 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="state" class="form-label">State</label>
-                        <input type="text" id="state" class="form-control" placeholder="Enter State" />
+                        <select id="state" class="form-select">
+                            <option value="">Select State</option>
+                            @foreach ($states as $state)
+                                <option value="{{ $state->state_name }}">{{ $state->state_name }}</option>
+                            @endforeach
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="discount" class="form-label">Discount</label>
                         <select id="discount" class="form-select">
-                            <option value="">Select Discount</option>
+                            <option value="0">0%</option>
                             <option value="1">1%</option>
                             <option value="2">2%</option>
                             <option value="3">3%</option>
@@ -118,7 +123,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Sales Parson Edit</h5>
+                <h5 class="modal-title" id="exampleModalLabel1">Customer Edit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -167,14 +172,19 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="editstate" class="form-label">State</label>
-                        <input type="text" id="editstate" class="form-control" placeholder="Enter State" />
+                        <select id="editstate" class="form-select">
+                            <option value="">Select State</option>
+                            @foreach ($states as $state)
+                                <option value="{{ $state->state_name }}">{{ $state->state_name }}</option>
+                            @endforeach
+                        </select>
                         <small class="error-text text-danger"></small>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="editdiscount" class="form-label">Discount</label>
                         <select id="editdiscount" class="form-select">
-                            <option value="">Select Discount</option>
+                            <option value="0">0%</option>
                             <option value="1">1%</option>
                             <option value="2">2%</option>
                             <option value="3">3%</option>

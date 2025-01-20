@@ -62,6 +62,11 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="text" id="password" class="form-control" placeholder="Enter Password" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
                         <label for="address" class="form-label">Address</label>
                         <input type="text" id="address" class="form-control" placeholder="Enter Address" />
                         <small class="error-text text-danger"></small>
@@ -110,6 +115,11 @@
                     <div class="col-md-12 mb-3">
                         <label for="edit_email" class="form-label">Email</label>
                         <input type="text" id="edit_email" class="form-control" placeholder="Enter Email" />
+                        <small class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="edit_password" class="form-label">Password</label>
+                        <input type="text" id="edit_password" class="form-control" placeholder="Enter Password" />
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -195,6 +205,7 @@
                 phone: $('#phone').val(),
                 email: $('#email').val(),
                 address : $('#address').val(),
+                password : $('#password').val(),
                 dob : $('#dob').val(),
                 alternative_phone : $('#alternative_phone').val(),
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
@@ -271,6 +282,7 @@
                     full_name: $('#edit_full_name').val(),
                     email: $('#edit_email').val(),
                     phone: $('#edit_phone').val(),
+                    password : $('#edit_password').val(),
                     alternative_phone: $('#edit_alternative_phone').val(),
                     dob: $('#edit_dob').val(),
                     address: $('#edit_address').val(),

@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\{
     Customer,
     User,
-    Invoice
+    Invoice,
+    State
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
@@ -28,9 +29,10 @@ class InvoiceController extends Controller
 
         $salesparsons = User::where('status','active')->where('role','salesparson')->get();
 
+        $states = State::orderBy('state_id', 'asc')->get();
 
         // Pass the data to the view
-        return view('admin.invoice.index', compact('customers','salesparsons'));
+        return view('admin.invoice.index', compact('customers','salesparsons','states'));
     }
 
     /**

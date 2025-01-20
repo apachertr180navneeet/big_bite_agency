@@ -20,27 +20,20 @@
 			</a>
 		</li>
 
-		<li class="menu-item {{ request()->routeIs('admin.salesparsonmanagment.*') || request()->routeIs('admin.customer.*') || request()->routeIs('admin.invoice.*') || request()->routeIs('admin.receipt.*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div class="text-truncate" data-i18n="Master">Master</div>
-            </a>
-            <ul class="menu-sub">
-                @foreach([
-                    ['route' => 'admin.salesparsonmanagment.index', 'text' => 'Sales Parson'],
-					['route' => 'admin.customer.index', 'text' => 'Customer'],
-					['route' => 'admin.invoice.index', 'text' => 'Invoice'],
-					['route' => 'admin.receipt.index', 'text' => 'Receipt'],
-                ] as $mastermenu)
-                    <li class="menu-item {{ request()->routeIs($mastermenu['route']) ? 'active' : '' }}">
-                        <a href="{{ route($mastermenu['route']) }}" class="menu-link">
-                            <i class="menu-icon tf-icons"></i>
-                            <div data-i18n="{{ $mastermenu['text'] }}">{{ $mastermenu['text'] }}</div>
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-        </li>
+		
+		@foreach([
+			['route' => 'admin.salesparsonmanagment.index', 'text' => 'Sales Parson'],
+			['route' => 'admin.customer.index', 'text' => 'Customer'],
+			['route' => 'admin.invoice.index', 'text' => 'Invoice'],
+			['route' => 'admin.receipt.index', 'text' => 'Receipt'],
+		] as $mastermenu)
+			<li class="menu-item {{ request()->routeIs($mastermenu['route']) ? 'active' : '' }}">
+				<a href="{{ route($mastermenu['route']) }}" class="menu-link">
+					<i class="menu-icon tf-icons"></i>
+					<div data-i18n="{{ $mastermenu['text'] }}">{{ $mastermenu['text'] }}</div>
+				</a>
+			</li>
+		@endforeach
 		
 	</ul>
 </aside>
