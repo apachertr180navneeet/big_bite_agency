@@ -181,7 +181,7 @@ class SalesparsonmanagmentController extends Controller
                 'address' => $request->address,
                 'dob' => $request->dob,
                 'alternative_phone' => $request->alternative_phone,
-                "password" => Hash::make($request->phone),
+                "password" => Hash::make($request->password),
             ];
             $user->update($dataUser);
             return response()->json(['success' => true , 'message' => 'Branch Update Successfully']);

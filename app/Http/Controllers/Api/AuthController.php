@@ -291,7 +291,7 @@ class AuthController extends Controller
     {
         $data = $request->all();
         $validator = Validator::make($data, [
-            'email' => 'required',
+            'phone' => 'required',
             'password' => 'required',
             'device_type'=>'required|in:ios,android',
             'device_token'=>'required',
@@ -306,12 +306,12 @@ class AuthController extends Controller
         
         try
         {
-            $user = User::where('email',$data['email'])->where('role','salesparson')->first();
+            $user = User::where('phone',$data['phone'])->where('role','salesparson')->first();
            
             if(!$user){
                 return response()->json([
                     'status' => false,
-                    'message' => 'Email not exists',
+                    'message' => 'Mobile not exists',
                 ]);      
             }
 
@@ -322,13 +322,13 @@ class AuthController extends Controller
                 ]);      
             }
             
-            $input['email'] = $data['email'];
+            $input['phone'] = $data['phone'];
             $input['password'] = $data['password'];
 
             if(!$token = JWTAuth::attempt($input)) {
                 return response()->json([
                     'status' => false,
-                    'message'=>'Invalid emai; or password. Please try again'
+                    'message'=>'Invalid phone or password. Please try again'
                 ],200);
             }
 
