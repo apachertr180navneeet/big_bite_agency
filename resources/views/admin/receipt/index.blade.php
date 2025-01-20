@@ -84,24 +84,17 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="discount" class="form-label">Discount</label>
-                        <input type="text" id="discount" class="form-control" placeholder="Enter Discount"/>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="final_amount" class="form-label">Final Amount</label>
-                        <input type="text" id="final_amount" class="form-control" placeholder="Enter Final Amount"/>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-6 mb-3">
                         <label for="given_amount" class="form-label">Given Amount</label>
                         <input type="text" id="given_amount" class="form-control" placeholder="Enter Given Amount"/>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="remaing_amount" class="form-label">Remaing Amount</label>
-                        <input type="text" id="remaing_amount" class="form-control" placeholder="Enter Remaing Amount"/>
-                        <small class="error-text text-danger"></small>
+                        <label for="discount" class="form-label">Discount</label>
+                        <input type="text" id="givendiscount" class="form-control" placeholder="Enter Discount" value="0.00"/>
+                        <input type="hidden" id="discount" class="form-control" placeholder="Enter Discount"/>
+                        <input type="hidden" id="final_amount" class="form-control" placeholder="Enter Final Amount"/>
+                        <input type="hidden" id="remaing_amount" class="form-control" placeholder="Enter Remaing Amount"/>
+                        <small id= "error-message" class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="sales_parson" class="form-label">Sales Parson</label>
@@ -561,6 +554,25 @@
         window.updateMangaerStatus = updateMangaerStatus;
         window.deleteUser = deleteUser;
         window.editUser = editUser;
+    });
+
+    $(document).ready(function () {
+        $('#givendiscount').on('input', function () {
+            // Get the values from both fields
+            const discount = parseFloat($('#discount').val()) || 0;
+            const givendiscount = parseFloat($(this).val()) || 0;
+
+            // Error message element
+            const errorMessage = $('#error-message');
+
+            // Check if the given discount exceeds the discount
+            if (givendiscount > discount) {
+                errorMessage.text("You can't enter more than the discount value "+givendiscount+".");
+                $(this).val('0'); // Clear the input field
+            } else {
+                errorMessage.text(''); // Clear the error message
+            }
+        });
     });
 </script>
 @endsection

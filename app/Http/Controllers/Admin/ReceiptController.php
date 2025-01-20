@@ -65,6 +65,12 @@ class ReceiptController extends Controller
     {
         try {
             $User = Receipt::findOrFail($request->userId);
+            if($User->full_payment == 'yes'){
+                $Bill = Invoice::findOrFail($User->bill_id);
+                $Bill->payment = 'done';
+                $Bill->save();
+            }
+            $User->manager_status = 'active';
             $User->status = $request->status;
             $User->save();
 

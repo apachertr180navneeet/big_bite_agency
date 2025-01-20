@@ -24,6 +24,7 @@
                                     <th>Invoice</th>
                                     <th>Customer Nmae</th>
                                     <th>Assign To</th>
+                                    <th>Payment</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -257,6 +258,15 @@
                 },
                 {
                     data: "amount",
+                },
+                {
+                    data: "payment",
+                    render: (data, type, row) => {
+                        const statusBadge = row.payment === "done" ?
+                            '<span class="badge bg-label-success me-1">Done</span>' :
+                            '<span class="badge bg-label-danger me-1">Pending</span>';
+                        return statusBadge;
+                    },
                 },
                 {
                     data: "status",
