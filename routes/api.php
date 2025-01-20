@@ -49,5 +49,8 @@ Route::middleware('jwt.verify')->group(function() {
     Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
 
     Route::get('/customer/list', [CustomerController::class, 'customerList']);
+    Route::post('/customer/recept', [CustomerController::class, 'customerReceipt']);
+    Route::post('/customer/invoice/detail', [CustomerController::class, 'customerInvoiceDetail']);
+    Route::post('/customer/recept/store', [CustomerController::class, 'customerReceptStore']);
     
 });

@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Models\{
     Customer,
-    Invoice
+    Invoice,
+    Receipt
 };
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
@@ -84,6 +85,159 @@ class CustomerController extends Controller
                     'next_url' => $invoices->nextPageUrl(), // URL for the next page (if exists)
                     'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : "", // Next page number (if exists)
                 ],
+            ], 200);
+
+        } catch (Exception $e) {
+            // Return a response with error details in case of any exception
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(), // Include the exception message
+            ], 500); // Return a 500 internal server error status
+        }
+    }
+
+    public function customerReceipt(Request $request)
+    {
+        try {
+            // Get the authenticated user's ID
+            $id = auth()->user()->id;
+
+            // Filtering by the authenticated user's assigned invoices with 'pending' payment status
+            $invoices = Invoice::where('invoices.assign', $id)
+                ->where('invoices.payment', 'pending') // Only 'pending' invoices
+                ->where('invoices.customer', $request->customer)
+                ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id') // Left join with 'receipts' to get payment details (if available)
+                ->select(
+                    DB::raw('SUM(COALESCE(receipts.remaing_amount, invoices.amount)) as due') // Calculate the due amount (sum of remaining amount or invoice amount)
+                )
+                ->first(); // Get the first result (since we're expecting a single result)
+
+                $invoicesLists = Invoice::where('invoices.assign', $id)
+                ->where('invoices.payment', 'pending') // Only 'pending' invoices
+                ->where('invoices.customer', $request->customer)
+                ->get(); // Get all matching invoices
+
+                $invoiceBillNumber = [];  // Initialize the array to store invoice details
+
+                foreach ($invoicesLists as $key => $value) {
+                    $invoiceBillNumber[] = [
+                        'invoice_id' => $value->id,
+                        'invoice' => $value->invoice,  // Store the bill number
+                    ];
+                }
+
+            // If no invoices are found, return a 'Customer not found' response
+            if (!$invoices) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Customer not found.',
+                ], 200);
+            }
+
+            // Return the response with the customer data
+            return response()->json([
+                'status' => true,
+                'message' => 'Customer found successfully.',
+                'remaining_amount' => $invoices->due, // Return the due amount
+                'invoic_list' => $invoiceBillNumber
+            ], 200);
+
+        } catch (Exception $e) {
+            // Return a response with error details in case of any exception
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(), // Include the exception message
+            ], 500); // Return a 500 internal server error status
+        }
+    }
+
+    public function customerInvoiceDetail(Request $request)
+    {
+        try {
+            // Get the authenticated user's ID
+            $id = auth()->user()->id;
+
+            $invoice = Invoice::where('invoices.id', $request->invoice)
+                ->join('users', 'invoices.assign', '=', 'users.id')
+                ->join('customers', 'invoices.customer', '=', 'customers.id')
+                ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id')
+                ->select('invoices.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id', 'invoices.assign as assign_id', 'customers.name as customers_name' , 'customers.discount as customers_discount' , 'users.full_name as assign_name')
+                ->first();
+
+                $discountAmount = $invoice->amount * ($invoice->customers_discount / 100);
+                
+                $invoice["max_discount_amount"] = $discountAmount;
+            // If no invoices are found, return a 'Customer not found' response
+            if (!$invoice) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Customer not found.',
+                ], 200);
+            }
+
+            // Return the response with the customer data
+            return response()->json([
+                'status' => true,
+                'message' => 'Invoice found successfully.',
+                'invoic_detail' => $invoice
+            ], 200);
+
+        } catch (Exception $e) {
+            // Return a response with error details in case of any exception
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(), // Include the exception message
+            ], 500); // Return a 500 internal server error status
+        }
+    }
+
+    public function customerReceptStore(Request $request)
+    {
+        try {
+            // Get the authenticated user's ID
+            $id = auth()->user()->id;
+
+            // Validation rules
+            $rules = [
+                'date' => 'required|string',
+                'receipt' => 'required|unique:receipts,receipt',
+                'bill_id' => 'required',
+                'amount' => 'required',
+                'discount' => 'required',
+                'full_payment' => 'required',
+            ];
+
+            // Validate the request data
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ]);
+            }
+
+            $user = Auth::user();
+
+            $compId = $user->firm_id;
+            // Save the User data
+            $dataUser = [
+                'date' => $request->date,
+                'receipt' => $request->receipt,
+                'bill_id' => $request->bill_id,
+                'assign' => $id,
+                'amount' => $request->amount,
+                'discount' => $request->discount,
+                'full_payment' => $request->full_payment,
+                'remaing_amount' => '0',
+            ];
+            $receipt = Receipt::create($dataUser);
+
+            // Return the response with the customer data
+            return response()->json([
+                'status' => true,
+                'message' => 'Recept Created Succesfully.',
+                'invoic_detail' => $receipt
             ], 200);
 
         } catch (Exception $e) {
