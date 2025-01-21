@@ -75,15 +75,15 @@ class CustomerController extends Controller
                 'message' => 'Customers found successfully.',
                 'customer' => $invoiceData, // Customer data (transformed)
                 'pagination' => [
-                    'current_page' => $invoices->currentPage(), // Current page number
-                    'total_pages' => $invoices->lastPage(), // Total number of pages
-                    'total_items' => $invoices->total(), // Total number of items (customers)
-                    'items_per_page' => $invoices->perPage(), // Items per page
-                    'current_url' => $invoices->url($invoices->currentPage()), // URL for the current page
-                    'last_url' => $invoices->url($invoices->lastPage()), // URL for the last page
-                    'previous_url' => $invoices->previousPageUrl(), // URL for the previous page (if exists)
-                    'next_url' => $invoices->nextPageUrl(), // URL for the next page (if exists)
-                    'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : "", // Next page number (if exists)
+                    'current_page' => $invoices->currentPage() ?: "", 
+                    'total_pages' => $invoices->lastPage() ?: "", 
+                    'total_items' => $invoices->total() ?: "", 
+                    'items_per_page' => $invoices->perPage() ?: "", 
+                    'current_url' => $invoices->url($invoices->currentPage()) ?: "", 
+                    'last_url' => $invoices->url($invoices->lastPage()) ?: "", 
+                    'previous_url' => $invoices->previousPageUrl() ?: "", 
+                    'next_url' => $invoices->nextPageUrl() ?: "", 
+                    'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : "",
                 ],
             ], 200);
 
@@ -205,6 +205,8 @@ class CustomerController extends Controller
                 'amount' => 'required',
                 'discount' => 'required',
                 'full_payment' => 'required',
+                'remark' => 'required',
+                'mode' => 'required',
             ];
 
             // Validate the request data
@@ -229,9 +231,34 @@ class CustomerController extends Controller
                 'amount' => $request->amount,
                 'discount' => $request->discount,
                 'full_payment' => $request->full_payment,
+                'remark' => $request->remark,
+                'mode' => $request->mode,
                 'remaing_amount' => '0',
             ];
             $receipt = Receipt::create($dataUser);
+
+            // Return the response with the customer data
+            return response()->json([
+                'status' => true,
+                'message' => 'Recept Created Succesfully.',
+                'invoic_detail' => $receipt
+            ], 200);
+
+        } catch (Exception $e) {
+            // Return a response with error details in case of any exception
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(), // Include the exception message
+            ], 500); // Return a 500 internal server error status
+        }
+    }
+
+    public function customerLeger($legerid)
+    {
+        try {
+            // Get the authenticated user's ID
+            
+            echo $legerid; die;
 
             // Return the response with the customer data
             return response()->json([

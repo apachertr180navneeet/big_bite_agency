@@ -232,13 +232,13 @@ class AdminAuthController extends Controller
         {
             $user = Auth::user();
             $data = $request->all();
-            $validator = Validator::make($data,[
+            $validator = Validator::make($data, [
                 "first_name" => "required",
                 "last_name" => "required",
-                "phone" => "required|min:9|unique:users,phone," .$user->id,
+                "phone" => "required|numeric|min:9|unique:users,phone," . $user->id,
                 "email" => "required|email|unique:users,email," . $user->id,
                 "avatar" => "sometimes|image|mimes:jpeg,jpg,png|max:5000"
-            ]);
+            ]);            
             
             if($validator->fails()) {
                 return redirect()->back()->withInput($request->all())->withErrors($validator->errors());

@@ -26,6 +26,8 @@ class Receipt extends Model
         'full_payment',
         'remaing_amount',
         'manager_status',
+        'remark',
+        'mode',
         'status',
     ];
 

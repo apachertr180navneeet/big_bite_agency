@@ -93,13 +93,13 @@ class SalesparsonmanagmentController extends Controller
         // Validation rules
         $rules = [
             'full_name' => 'required|string',
-            'phone' => 'required|unique:users,phone',
+            'phone' => 'required|numeric|digits:10|unique:users,phone',
             'email' => 'nullable|email|unique:users,email',
             'address' => 'required',
             'password' => 'required|string|min:8',
             'dob' => 'nullable|date',
-            'alternative_phone' => 'nullable|unique:users,alternative_phone',
-        ];
+            'alternative_phone' => 'nullable|numeric|digits:10|unique:users,alternative_phone',
+        ];        
         
         // Validate the request data
         $validator = Validator::make($request->all(), $rules);
@@ -147,6 +147,8 @@ class SalesparsonmanagmentController extends Controller
             'full_name' => 'required|string',
             'phone'  => [
                 'required',
+                'numeric',
+                'digits:10',
                 Rule::unique('users', 'phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
             ],
             'email'  => [
@@ -158,6 +160,8 @@ class SalesparsonmanagmentController extends Controller
             'dob' => 'nullable',
             'alternative_phone'  => [
                 'nullable',
+                'numeric',
+                'digits:10',
                 Rule::unique('users', 'alternative_phone')->ignore($request->id), // Ensure account number is unique, ignoring the current record
             ],
         ];

@@ -96,7 +96,7 @@ class CustomerController extends Controller
         $rules = [
             'name' => 'required|string',
             'firm' => 'required|unique:customers,firm',
-            'phone' => 'required|unique:customers,phone',
+            'phone' => 'required|numeric|digits:10|unique:customers,phone',
             'email' => 'nullable|email|unique:customers,email',
             'gst' => 'required|unique:customers,gst',
             'address1' => 'required',
@@ -162,6 +162,8 @@ class CustomerController extends Controller
             ],
             'phone'  => [
                 'required',
+                'numeric',
+                'digits:10',
                 Rule::unique('customers', 'phone')->ignore($request->id), // Ensure phone is unique, ignoring the current record
             ],
             'gst'  => [

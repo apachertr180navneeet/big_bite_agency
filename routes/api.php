@@ -52,5 +52,6 @@ Route::middleware('jwt.verify')->group(function() {
     Route::post('/customer/recept', [CustomerController::class, 'customerReceipt']);
     Route::post('/customer/invoice/detail', [CustomerController::class, 'customerInvoiceDetail']);
     Route::post('/customer/recept/store', [CustomerController::class, 'customerReceptStore']);
-    
 });
+
+Route::get('/customer/leger/{legerid}', [CustomerController::class, 'customerLeger']);
