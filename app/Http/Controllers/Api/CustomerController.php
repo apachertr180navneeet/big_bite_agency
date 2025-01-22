@@ -13,6 +13,8 @@ use App\Models\{
 use Mail, DB, Hash, Validator, Session, File, Exception, Redirect, Auth;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
 {
@@ -220,12 +222,15 @@ class CustomerController extends Controller
             }
 
             $user = Auth::user();
+            $lastReceipt = Receipt::latest('id')->first();
+
+            $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
 
             $compId = $user->firm_id;
             // Save the User data
             $dataUser = [
                 'date' => $request->date,
-                'receipt' => $request->receipt,
+                'receipt' => $newReceipt,
                 'bill_id' => $request->bill_id,
                 'assign' => $id,
                 'amount' => $request->amount,
@@ -253,26 +258,101 @@ class CustomerController extends Controller
         }
     }
 
-    public function customerLeger($legerid)
+    public function customerLeger($ledgerId)
     {
         try {
-            // Get the authenticated user's ID
-            
-            echo $legerid; die;
+            // Fetch the customer using the provided ledger ID
+            $customer = Customer::find($ledgerId);
 
-            // Return the response with the customer data
+            // Check if the customer exists
+            if (!$customer) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Customer not found.',
+                ], 404);
+            }
+
+            // Prepare customer details
+            $customerDetails = [
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'city' => $customer->city,
+                'phone' => $customer->phone,
+            ];
+
+            // Fetch all invoices for the customer
+            $invoiceLists = Invoice::where('customer', $ledgerId)
+                ->where('invoices.payment', 'pending')
+                ->get();
+
+            $ledgerData = []; // To store merged and sorted data
+            $totalInvoice = 0; // Total invoice amount
+            $totalReceipt = 0; // Total receipt amount
+
+            // Process invoices and related receipts
+            foreach ($invoiceLists as $invoice) {
+                // Add invoice entry to ledger data
+                $ledgerData[] = [
+                    'date' => $invoice->date,
+                    'description' => $invoice->invoice,
+                    'bill' => $invoice->amount,
+                    'receipt' => '0',
+                ];
+
+                $totalInvoice += $invoice->amount; // Increment total invoice amount
+
+                // Fetch all receipts linked to the invoice
+                $receiptLists = Receipt::where('bill_id', $invoice->id)->get();
+                foreach ($receiptLists as $receipt) {
+                    $ledgerData[] = [
+                        'date' => $receipt->date,
+                        'description' => $receipt->receipt,
+                        'bill' => '0',
+                        'receipt' => $receipt->amount,
+                    ];
+
+                    $totalReceipt += $receipt->amount; // Increment total receipt amount
+                }
+            }
+
+            // Sort ledger data by date
+            usort($ledgerData, function ($a, $b) {
+                return strtotime($a['date']) - strtotime($b['date']);
+            });
+
+            // Calculate total due
+            $totalDue = $totalInvoice - $totalReceipt;
+
+            // Generate the PDF using the 'ledger-pdf' view
+            $pdf = Pdf::loadView('ledger-pdf', compact('customerDetails', 'ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue'));
+
+            // Define the file path to save the PDF in the public/uploads folder
+            $filePath = public_path('uploads/ledger_' . $ledgerId . '_' . time() . '.pdf');
+
+            // Ensure the uploads directory exists
+            if (!file_exists(public_path('uploads'))) {
+                mkdir(public_path('uploads'), 0755, true);
+            }
+
+            // Save the PDF to the specified path
+            $pdf->save($filePath);
+
+            // Generate the URL for the saved PDF
+            $pdfUrl = asset('uploads/' . basename($filePath));
+
+            // Return the URL as a response
             return response()->json([
                 'status' => true,
-                'message' => 'Recept Created Succesfully.',
-                'invoic_detail' => $receipt
-            ], 200);
-
-        } catch (Exception $e) {
-            // Return a response with error details in case of any exception
+                'message' => 'PDF generated successfully.',
+                'pdf_url' => $pdfUrl,
+            ]);
+        } catch (\Exception $e) {
+            // Handle exceptions and return error response
             return response()->json([
                 'status' => false,
-                'message' => 'An error occurred: ' . $e->getMessage(), // Include the exception message
-            ], 500); // Return a 500 internal server error status
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
         }
     }
+
 }
