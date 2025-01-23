@@ -22,8 +22,9 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Invoice</th>
-                                    <th>Customer Nmae</th>
+                                    <th>Customer Name</th>
                                     <th>Assign To</th>
+                                    <th>Amount</th>
                                     <th>Payment</th>
                                     <th>Status</th>
                                     <th>Action</th>
