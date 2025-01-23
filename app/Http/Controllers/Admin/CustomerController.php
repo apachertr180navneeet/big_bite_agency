@@ -210,7 +210,7 @@ class CustomerController extends Controller
             // Add invoice data
             $ledgerData[] = [
                 'date' => $invoiceValue->date,
-                'description' => $invoiceValue->invoice,
+                'description' => "Sales Invoice " .$invoiceValue->invoice,
                 'bill' => $invoiceValue->amount,
                 'receipt' => '0',
             ];
@@ -223,7 +223,7 @@ class CustomerController extends Controller
             foreach ($receiptLists as $receiptValue) {
                 $ledgerData[] = [
                     'date' => $receiptValue->date,
-                    'description' => $receiptValue->receipt,
+                    'description' => "Recepit Voucher " . $receiptValue->receipt,
                     'bill' => '0',
                     'receipt' => $receiptValue->amount,
                 ];

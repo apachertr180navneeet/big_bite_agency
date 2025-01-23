@@ -294,7 +294,7 @@ class CustomerController extends Controller
                 // Add invoice entry to ledger data
                 $ledgerData[] = [
                     'date' => $invoice->date,
-                    'description' => $invoice->invoice,
+                    'description' => "Sales Invoice " . $invoice->invoice,
                     'bill' => $invoice->amount,
                     'receipt' => '0',
                 ];
@@ -306,7 +306,7 @@ class CustomerController extends Controller
                 foreach ($receiptLists as $receipt) {
                     $ledgerData[] = [
                         'date' => $receipt->date,
-                        'description' => $receipt->receipt,
+                        'description' => "Recepit Voucher " . $receipt->receipt,
                         'bill' => '0',
                         'receipt' => $receipt->amount,
                     ];
