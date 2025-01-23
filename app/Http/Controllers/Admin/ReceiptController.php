@@ -103,7 +103,7 @@ class ReceiptController extends Controller
     public function destroy($id)
     {
         try {
-            Receipt::where('id', $id)->delete();
+            Receipt::where('id', $id)->forceDelete();
 
             return response()->json([
                 'success' => true,
@@ -212,4 +212,18 @@ class ReceiptController extends Controller
             ->first();
         return response()->json($invoice);
     }
+
+    public function getPendingInvoices($customerId)
+    {
+        try {
+            $invoices = Invoice::where('customer', $customerId)
+                ->where('payment', 'pending') // Adjust the condition based on your status column
+                ->get(['id', 'invoice']); // Select only necessary fields
+
+            return response()->json(['success' => true, 'invoices' => $invoices]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
 }

@@ -64,20 +64,27 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="bill_id" class="form-label">Bill No.</label>
-                        <select id="bill_id" class="form-select">
-                            <option value="">Select Invoice</option>
-                            @foreach ($invoices as $invoice)
-                                <option value="{{ $invoice->id }}">{{ $invoice->invoice }}</option>
+                        <label for="customer" class="form-label">Customer</label>
+                        <select id="customer" class="form-select" onchange="fetchPendingInvoices()">
+                            <option value="">Select Customer</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->firm }}</option>
                             @endforeach
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
+                        <label for="bill_id" class="form-label">Bill No.</label>
+                        <select id="bill_id" class="form-select">
+                            <option value="">Select Invoice</option>
+                        </select>
+                        <small class="error-text text-danger"></small>
+                    </div>                    
+                    {{--  <div class="col-md-6 mb-3">
                         <label for="customer" class="form-label">Customer</label>
                         <input type="text" id="customer" class="form-control" placeholder="Enter customer"/>
                         <small class="error-text text-danger"></small>
-                    </div>
+                    </div>  --}}
                     <div class="col-md-6 mb-3">
                         <label for="amount" class="form-label">Amount</label>
                         <input type="text" id="amount" class="form-control" placeholder="Enter Amount"/>
@@ -114,62 +121,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="AddItem">Save</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel1">Receipt Edit</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <input type="hidden" id="compid">
-                        <label for="editdate" class="form-label">Date</label>
-                        <input type="text" id="editdate"class="form-control" placeholder="Enter Date"/>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="editinvoice" class="form-label">Invoice No.</label>
-                        <input type="text" id="editinvoice" class="form-control" placeholder="Enter Invoice No."/>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="editcustomer" class="form-label">Customer Name</label>
-                        <select id="editcustomer" class="form-select">
-                            <option value="">Select Customer</option>
-                            @foreach ($customers as $customer)
-                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="editassign" class="form-label">Sales Parson Name</label>
-                        <select id="editassign" class="form-select">
-                            <option value="">Select Sales Parson</option>
-                            @foreach ($salesparsons as $salesparson)
-                                <option value="{{ $salesparson->id }}">{{ $salesparson->full_name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label for="editamount" class="form-label">Amount</label>
-                        <input type="text" id="editamount" class="form-control" placeholder="Enter Amount"/>
-                        <small class="error-text text-danger"></small>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="EditComapany">Save</button>
             </div>
         </div>
     </div>
@@ -214,7 +165,7 @@
                     var remainingAmount = finalAmount - givenamount;
     
                     // Set values in the form fields
-                    $('#customer').val(data.customers_name);
+                    //$('#customer').val(data.customers_name);
                     $('#sales_parson').val(data.assign_name);
                     $('#amount').val(data.amount);
                     $('#discount').val(discountAmount); // Use the rounded discount amount here
@@ -301,19 +252,23 @@
                 {
                     data: "action",
                     render: (data, type, row) => {
-                        @if ($user->role == 'admin')
-                            const statusButton = row.status === "inactive"
-                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
-                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Pending</button>`;
-                        @else
-                            const statusButton = row.manager_status === "inactive"
-                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateMangaerStatus(${row.id}, 'active')">Recived</button>`
-                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateMangaerStatus(${row.id}, 'inactive')">Pending</button>`;
-                        @endif
-                        //const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
-                        const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
+                        if (row.status === "inactive") {
+                            @if ($user->role == 'admin')
+                                const statusButton = row.status === "inactive"
+                                ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
+                                : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Pending</button>`;
+                            @else
+                                const statusButton = row.manager_status === "inactive"
+                                ? `<button type="button" class="btn btn-sm btn-success" onclick="updateMangaerStatus(${row.id}, 'active')">Recived</button>`
+                                : `<button type="button" class="btn btn-sm btn-danger" onclick="updateMangaerStatus(${row.id}, 'inactive')">Pending</button>`;
+                            @endif
+                            const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
+                            //const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
 
-                        return `${statusButton} ${editButton}`;
+                            return `${statusButton} ${deleteButton}`;
+                        }else{
+                            return 'After Completing payment Action not avalable';
+                        }
                     },
                 },
 
@@ -366,69 +321,6 @@
                 },
                 error: function(xhr) {
                     setFlash("error", "An unexpected error occurred.");
-                }
-            });
-        });
-
-        // Define editUser function
-        function editUser(userId) {
-            const url = '{{ route("admin.receipt.get", ":userid") }}'.replace(":userid", userId);
-            $.ajax({
-                url: url, // Update this URL to match your route
-                method: 'GET',
-                success: function(data) {
-                    // Populate modal fields with the retrieved data
-                    $('#compid').val(data.id);
-                    $('#editdate').val(data.date);
-                    $('#editinvoice').val(data.invoice);
-                    $('#editcustomer').val(data.customer);
-                    $('#editassign').val(data.assign);
-                    $('#editamount').val(data.amount);
-
-                    // Open the modal
-                    $('#editModal').modal('show');
-                    setFlash("success", 'Invoice found successfully.');
-                },
-                error: function(xhr) {
-                    setFlash("error", "Invoice not found. Please try again later.");
-                }
-            });
-        }
-
-        // Handle form submission
-        $('#EditComapany').on('click', function() {
-            const userId = $('#compid').val(); // Ensure userId is available in the scope
-            $.ajax({
-                url: '{{ route('admin.receipt.update') }}', // Update this URL to match your route
-                method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    date: $('#editdate').val(),
-                    invoice: $('#editinvoice').val(),
-                    customer: $('#editcustomer').val(),
-                    assign: $('#editassign').val(),
-                    amount: $('#editamount').val(),
-                    id: userId // Ensure userId is in scope or adjust accordingly
-                },
-                success: function(response) {
-                    if (response.success == true) {
-                        // Optionally, refresh the page or update the table with new data
-                        //table.ajax.reload();
-                        setFlash("success", response.message);
-                        $('#editModal').modal('hide'); // Close the modal
-                        $('#editModal').find('input, textarea, select').val(''); // Reset form fields
-                        table.ajax.reload(); // Reload DataTable
-                    } else {
-                        for (let field in response.errors) {
-                            let $field = $(`#edit${field}`);
-                            if ($field.length) {
-                                $field.siblings('.error-text').text(response.errors[field][0]);
-                            }
-                        }
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error updating Invoice data:', xhr);
                 }
             });
         });
@@ -553,7 +445,7 @@
         window.updateUserStatus = updateUserStatus;
         window.updateMangaerStatus = updateMangaerStatus;
         window.deleteUser = deleteUser;
-        window.editUser = editUser;
+        //window.editUser = editUser;
     });
 
     $(document).ready(function () {
@@ -574,5 +466,31 @@
             }
         });
     });
+
+    function fetchPendingInvoices() {
+        let customerId = document.getElementById('customer').value;
+
+        // Clear previous options
+        let invoiceSelect = document.getElementById('bill_id');
+        invoiceSelect.innerHTML = '<option value="">Select Invoice</option>';
+
+        if (customerId) {
+            fetch(`/admin/receipt/get-pending-invoices/${customerId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        data.invoices.forEach(invoice => {
+                            let option = document.createElement('option');
+                            option.value = invoice.id;
+                            option.textContent = invoice.invoice;
+                            invoiceSelect.appendChild(option);
+                        });
+                    } else {
+                        alert(data.message || 'Failed to fetch invoices.');
+                    }
+                })
+                .catch(error => console.error('Error fetching invoices:', error));
+        }
+    }
 </script>
 @endsection
