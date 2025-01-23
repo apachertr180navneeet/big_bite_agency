@@ -98,6 +98,97 @@ class CustomerController extends Controller
         }
     }
 
+    public function customerSearch(Request $request)
+    {
+        try {
+            // Get the authenticated user's ID
+            $id = auth()->user()->id;
+
+            // Define pagination parameters (items per page)
+            $perPage = 10;
+
+            // Initialize the query for invoices
+            $query = Invoice::where('invoices.assign', $id)
+                ->where('invoices.payment', 'pending') // Only 'pending' invoices
+                ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table to fetch assigned user info
+                ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table to fetch customer info
+                ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id') // Left join with 'receipts' to get payment details (if available)
+                ->select(
+                    'customers.id as customer_id', // Select customer ID
+                    'customers.name as customers_name', // Select customer name
+                    'customers.city as customers_city', // Select customer city
+                    'customers.phone as customers_phone', // Select customer phone
+                    DB::raw('COUNT(invoices.id) as pending_invoices_count'), // Count the number of pending invoices for each customer
+                    DB::raw('SUM(COALESCE(receipts.remaing_amount, invoices.amount)) as due') // Calculate the due amount (sum of remaining amount or invoice amount)
+                )
+                ->groupBy(
+                    'customers.id', // Group by customer ID
+                    'customers.name', // Group by customer name
+                    'customers.city', // Group by customer city
+                    'customers.phone' // Group by customer phone
+                );
+
+            // Apply search filters for name, phone, and city if provided
+            if ($request->has('name') && !empty($request->name)) {
+                $query->where('customers.name', 'like', '%' . $request->name . '%');
+            }
+            if ($request->has('phone') && !empty($request->phone)) {
+                $query->where('customers.phone', 'like', '%' . $request->phone . '%');
+            }
+            if ($request->has('city') && !empty($request->city)) {
+                $query->where('customers.city', 'like', '%' . $request->city . '%');
+            }
+
+            // Paginate the results
+            $invoices = $query->paginate($perPage);
+
+            // If no invoices are found, return a 'Customer not found' response
+            if ($invoices->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Customer not found.',
+                ], 200);
+            }
+
+            // Map the invoice data to a simpler structure for the response
+            $invoiceData = $invoices->map(function ($invoice) {
+                return [
+                    'customer_id' => $invoice->customer_id, // Customer ID
+                    'customers_name' => $invoice->customers_name, // Customer name
+                    'customers_city' => $invoice->customers_city, // Customer city
+                    'customers_phone' => $invoice->customers_phone, // Customer phone
+                    'due' => $invoice->due, // Due amount
+                    'total_bill' => $invoice->pending_invoices_count, // Total number of pending invoices
+                ];
+            });
+
+            // Return the response with the customer data and pagination details
+            return response()->json([
+                'status' => true,
+                'message' => 'Customers found successfully.',
+                'customer' => $invoiceData, // Customer data (transformed)
+                'pagination' => [
+                    'current_page' => $invoices->currentPage(),
+                    'total_pages' => $invoices->lastPage(),
+                    'total_items' => $invoices->total(),
+                    'items_per_page' => $invoices->perPage(),
+                    'current_url' => $invoices->url($invoices->currentPage()),
+                    'last_url' => $invoices->url($invoices->lastPage()),
+                    'previous_url' => $invoices->previousPageUrl(),
+                    'next_url' => $invoices->nextPageUrl(),
+                    'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : null,
+                ],
+            ], 200);
+        } catch (Exception $e) {
+            // Return a response with error details in case of any exception
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
     public function customerReceipt(Request $request)
     {
         try {
