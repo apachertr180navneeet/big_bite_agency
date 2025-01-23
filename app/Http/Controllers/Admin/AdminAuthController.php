@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\{
     User,
     Customer,
-    Invoice
+    Invoice,
+    Receipt
 };
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -273,6 +274,7 @@ class AdminAuthController extends Controller
         // Common date references
         $today = Carbon::today();
         $now = Carbon::now();
+        $dateOnly = $now->format('Y-m-d');
         $currentMonth = $now->month;
         $currentYear = $now->year;
 
@@ -295,8 +297,21 @@ class AdminAuthController extends Controller
         // Retrieve invoice counts
         $invoiceCounts = [
             'totalBill' => Invoice::count(),
-            'today' => Invoice::whereBetween('created_at', [$now->subDays(10), $now])->count(),
+            'today' => Invoice::whereDate('created_at', $dateOnly)->count(),
             'currentMonth' => Invoice::whereMonth('created_at', $currentMonth)
+                ->whereYear('created_at', $currentYear)
+                ->count(),
+        ];
+
+        $receiptCounts = [
+            'receipt' => Receipt::selectRaw("
+                SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_count,
+                SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive_count
+            ")->first(),
+
+            'totalBill' => Receipt::count(),
+            'today' => Receipt::whereDate('created_at', $dateOnly)->count(),
+            'currentMonth' => Receipt::whereMonth('created_at', $currentMonth)
                 ->whereYear('created_at', $currentYear)
                 ->count(),
         ];
@@ -312,6 +327,11 @@ class AdminAuthController extends Controller
             'todayCount' => $invoiceCounts['today'],
             'currentMonthCount' => $invoiceCounts['currentMonth'],
             'totalBill'=> $invoiceCounts['totalBill'],
+            'receiptActiveCount' => $receiptCounts['receipt']->active_count,
+            'receiptInactiveCount' => $receiptCounts['receipt']->inactive_count,
+            'receipttodayCount' => $receiptCounts['today'],
+            'receiptcurrentMonthCount' => $receiptCounts['currentMonth'],
+            'receipttotalBill'=> $receiptCounts['totalBill'],
         ]);
     }
 

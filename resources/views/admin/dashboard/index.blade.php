@@ -67,15 +67,15 @@
                             <div class="row">
                                 <div class="col-md-4 text-center">
                                     <h5 class="fw-medium d-block mb-1">Total Collection</h5>
-                                    <p class="card-title mb-2">Total - 10</p>
+                                    <p class="card-title mb-2">Total - {{ $receipttotalBill }}</p>
                                 </div>
                                 <div class="col-md-4 text-center">
                                     <h5 class="fw-medium d-block mb-1">Today Collection</h5>
-                                    <p class="card-title mb-2">Total - 10</p>
+                                    <p class="card-title mb-2">Total - {{ $receipttodayCount }}</p>
                                 </div>
                                 <div class="col-md-4 text-center">
                                     <h5 class="fw-medium d-block mb-1">Month Collection</h5>
-                                    <p class="card-title mb-2">Total - 10</p>
+                                    <p class="card-title mb-2">Total - {{ $receiptcurrentMonthCount }}</p>
                                 </div>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
                     <div class="card">
                         <div class="card-body text-center">
                             <h5 class="fw-medium d-block mb-1">Total Approved Receipt</h5>
-                            <p class="card-title mb-2">Total - 10</p>
+                            <p class="card-title mb-2">Total - {{ $receiptActiveCount }}</p>
                         </div>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
                     <div class="card">
                         <div class="card-body text-center">
                             <h5 class="fw-medium d-block mb-1">Total Unapproved Receipt</h5>
-                            <p class="card-title mb-2">Total - 10</p>
+                            <p class="card-title mb-2">Total - {{ $receiptInactiveCount }}</p>
                         </div>
                     </div>
                 </div>

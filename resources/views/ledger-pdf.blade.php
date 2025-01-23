@@ -27,10 +27,9 @@
     </style>
 </head>
 <body>
-    {{--  <h2>Customer Ledger</h2>
     <p><strong>Name:</strong> {{ $customerDetails['name'] }}</p>
     <p><strong>City:</strong> {{ $customerDetails['city'] }}</p>
-    <p><strong>Phone:</strong> {{ $customerDetails['phone'] }}</p>  --}}
+    <p><strong>Phone:</strong> {{ $customerDetails['phone'] }}</p>
 
     <table class="table table-bordered" id="branchTable">
         <thead>
