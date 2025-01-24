@@ -24,10 +24,10 @@
                             <label for="startDate">Start Date:</label>
                             <input type="date" id="startDate" class="form-control">
                         </div>
-                        <div class="col-md-3">
+                        {{--  <div class="col-md-3">
                             <label for="endDate">End Date:</label>
                             <input type="date" id="endDate" class="form-control">
-                        </div>
+                        </div>  --}}
                         <div class="col-md-3">
                             <label for="assignNameFilter">Assigned Name:</label>
                             <select id="assignNameFilter" class="form-select">
@@ -324,15 +324,15 @@
         // Custom date range filter
         $.fn.dataTable.ext.search.push((settings, data, dataIndex) => {
             const startDate = $('#startDate').val();
-            const endDate = $('#endDate').val();
+            //const endDate = $('#endDate').val();
             const date = data[0]; // Date column index
-
-            if (startDate && new Date(date) < new Date(startDate)) {
+            console.log('Start Date:', startDate, 'Table Date:', date);
+            if (startDate && date != startDate) {
                 return false;
             }
-            if (endDate && new Date(date) > new Date(endDate)) {
-                return false;
-            }
+            //if (endDate && new Date(date) > new Date(endDate)) {
+              //  return false;
+            //}
             return true;
         });
 
@@ -343,7 +343,7 @@
         });
 
         // Trigger filters
-        $('#startDate, #endDate').on('change', function () {
+        $('#startDate').on('change', function () {
             table.draw();
         });
 
