@@ -388,6 +388,7 @@ class CustomerController extends Controller
                     'description' => "Sales Invoice " . $invoice->invoice,
                     'bill' => $invoice->amount,
                     'receipt' => '0',
+                    'discount' => '0',
                 ];
 
                 $totalInvoice += $invoice->amount; // Increment total invoice amount
@@ -400,9 +401,10 @@ class CustomerController extends Controller
                         'description' => "Recepit Voucher " . $receipt->receipt,
                         'bill' => '0',
                         'receipt' => $receipt->amount,
+                        'discount' => $receipt->discount,
                     ];
 
-                    $totalReceipt += $receipt->amount; // Increment total receipt amount
+                    $totalReceipt += $receipt->amount + $receipt->discount; // Increment total receipt amount
                 }
             }
 
