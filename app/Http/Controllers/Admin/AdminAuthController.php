@@ -296,7 +296,8 @@ class AdminAuthController extends Controller
 
         // Retrieve invoice counts
         $invoiceCounts = [
-            'totalBill' => Invoice::count(),
+            'totalBill' => Invoice::where('payment', 'pending')->count(),
+            'totalAmount' => Invoice::where('payment', 'pending')->sum('amount'),
             'today' => Invoice::whereDate('created_at', $dateOnly)->count(),
             'currentMonth' => Invoice::whereMonth('created_at', $currentMonth)
                 ->whereYear('created_at', $currentYear)
@@ -327,6 +328,7 @@ class AdminAuthController extends Controller
             'todayCount' => $invoiceCounts['today'],
             'currentMonthCount' => $invoiceCounts['currentMonth'],
             'totalBill'=> $invoiceCounts['totalBill'],
+            'totalAmount'=> $invoiceCounts['totalAmount'],
             'receiptActiveCount' => $receiptCounts['receipt']->active_count,
             'receiptInactiveCount' => $receiptCounts['receipt']->inactive_count,
             'receipttodayCount' => $receiptCounts['today'],

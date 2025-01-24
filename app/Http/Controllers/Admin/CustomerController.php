@@ -97,8 +97,8 @@ class CustomerController extends Controller
             'name' => 'required|string',
             'firm' => 'required|unique:customers,firm',
             'phone' => 'required|numeric|digits:10|unique:customers,phone',
-            'email' => 'nullable|email|unique:customers,email',
-            'gst' => 'required|unique:customers,gst',
+            //'email' => 'nullable|email|unique:customers,email',
+            'gst' => 'nullable|unique:customers,gst',
             'address1' => 'required',
             'address2' => 'nullable|string',
             'city' => 'required',
@@ -123,7 +123,7 @@ class CustomerController extends Controller
         $dataUser = [
             'name' => $request->name,
             'firm' => $request->firm,
-            'email' => $request->email,
+            // 'email' => $request->email,
             'phone' => $request->phone,
             'gst' => $request->gst,
             'address1' => $request->address1,
@@ -156,10 +156,10 @@ class CustomerController extends Controller
                 'required',
                 Rule::unique('customers', 'firm')->ignore($request->id), // Ensure firm is unique, ignoring the current record
             ],
-            'email'  => [
-                'nullable',
-                Rule::unique('customers', 'email')->ignore($request->id), // Ensure email is unique, ignoring the current record
-            ],
+            // 'email'  => [
+            //     'nullable',
+            //     Rule::unique('customers', 'email')->ignore($request->id), // Ensure email is unique, ignoring the current record
+            // ],
             'phone'  => [
                 'required',
                 'numeric',
@@ -199,6 +199,8 @@ class CustomerController extends Controller
     public function lager($id)
     {
         $user = Auth::user();
+
+        $customerDetail = Customer::find($id);
 
         $invoiceLists = Invoice::where('customer', $id)->get();
 
@@ -244,6 +246,6 @@ class CustomerController extends Controller
         
 
         // Pass the ledger data and totals to the view
-        return view('admin.customer.leger', compact('ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue'));
+        return view('admin.customer.leger', compact('ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue','customerDetail'));
     }
 }

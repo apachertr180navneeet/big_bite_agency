@@ -7,7 +7,7 @@
 <!-- Content -->
 
 <div class="container-fluid flex-grow-1 container-p-y">
-    <div class="row">
+    {{--  <div class="row">
         <div class="col-lg-3 mb-2 order-0">
             <div class="card">
                 <div class="d-flex align-items-end row">
@@ -83,7 +83,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>  --}}
 
     <div class="row">
         <div class="col-lg-4 col-md-4 order-1">
@@ -103,8 +103,8 @@
                 <div class="col-lg-12 col-md-12 col-6 mb-4">
                     <div class="card">
                         <div class="card-body text-center">
-                            <h5 class="fw-medium d-block mb-1">Total Approved Receipt</h5>
-                            <p class="card-title mb-2">Total - {{ $receiptActiveCount }}</p>
+                            <h5 class="fw-medium d-block mb-1">Total Bill Count</h5>
+                            <p class="card-title mb-2">Total - {{ $totalBill }}</p>
                         </div>
                     </div>
                 </div>
@@ -115,8 +115,8 @@
                 <div class="col-lg-12 col-md-12 col-6 mb-4">
                     <div class="card">
                         <div class="card-body text-center">
-                            <h5 class="fw-medium d-block mb-1">Total Unapproved Receipt</h5>
-                            <p class="card-title mb-2">Total - {{ $receiptInactiveCount }}</p>
+                            <h5 class="fw-medium d-block mb-1">Total Collection</h5>
+                            <p class="card-title mb-2">Total - {{ $totalAmount }}</p>
                         </div>
                     </div>
                 </div>

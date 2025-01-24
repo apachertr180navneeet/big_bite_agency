@@ -29,6 +29,7 @@
                                     <th>Amount</th>
                                     <th>Discount</th>
                                     <th>Sales Parson</th>
+                                    <th>Firm</th>
                                     <th>Full Payment</th>
                                     <th>Manager Status</th>
                                     <th>Status</th>
@@ -60,13 +61,13 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="receipt" class="form-label">Receipt No.</label>
-                        <input type="text" id="receipt" class="form-control" placeholder="Enter Receipt No."/>
+                        <input type="text" id="receipt" class="form-control" value="{{ $newReceipt }}" placeholder="Enter Receipt No."/>
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="customer" class="form-label">Customer</label>
+                        <label for="customer" class="form-label">Firm</label>
                         <select id="customer" class="form-select" onchange="fetchPendingInvoices()">
-                            <option value="">Select Customer</option>
+                            <option value="">Select Firm</option>
                             @foreach ($customers as $customer)
                                 <option value="{{ $customer->id }}">{{ $customer->firm }}</option>
                             @endforeach
@@ -227,6 +228,9 @@
                 },
                 {
                     data: "assign_name",
+                },
+                {
+                    data: "customers_name",
                 },
                 {
                     data: "full_payment",

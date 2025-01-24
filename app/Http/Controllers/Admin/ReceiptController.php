@@ -31,9 +31,13 @@ class ReceiptController extends Controller
 
         $invoices = Invoice::get();
 
+        $lastReceipt = Receipt::latest('id')->first();
+
+        $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
+
 
         // Pass the data to the view
-        return view('admin.receipt.index', compact('customers','salesparsons','invoices'));
+        return view('admin.receipt.index', compact('customers','salesparsons','invoices','newReceipt'));
     }
 
     /**
@@ -49,7 +53,7 @@ class ReceiptController extends Controller
         $saleparson = Receipt::join('invoices', 'receipts.bill_id', '=', 'invoices.id')
         ->join('users', 'invoices.assign', '=', 'users.id')
         ->join('customers', 'invoices.customer', '=', 'customers.id')
-        ->select('receipts.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id', 'invoices.assign as assign_id', 'customers.name as customers_name' , 'users.full_name as assign_name')
+        ->select('receipts.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id', 'invoices.assign as assign_id', 'customers.firm as customers_name' , 'users.full_name as assign_name')
         ->get();
 
         return response()->json(['data' => $saleparson]);

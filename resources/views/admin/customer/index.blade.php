@@ -56,11 +56,11 @@
                         <input type="text" id="name" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    {{--  <div class="col-md-6 mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="text" id="email" class="form-control" placeholder="Enter Email" />
                         <small class="error-text text-danger"></small>
-                    </div>
+                    </div>  --}}
                     <div class="col-md-6 mb-3">
                         <label for="phone" class="form-label">Phone</label>
                         <input type="text" id="phone" class="form-control" placeholder="Enter Phone" />
@@ -140,11 +140,11 @@
                         <input type="text" id="editname" class="form-control" placeholder="Enter Name" />
                         <small class="error-text text-danger"></small>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    {{--  <div class="col-md-6 mb-3">
                         <label for="editemail" class="form-label">Email</label>
                         <input type="text" id="editemail" class="form-control" placeholder="Enter Email" />
                         <small class="error-text text-danger"></small>
-                    </div>
+                    </div>  --}}
                     <div class="col-md-6 mb-3">
                         <label for="editphone" class="form-label">Phone</label>
                         <input type="text" id="editphone" class="form-control" placeholder="Enter Phone" />

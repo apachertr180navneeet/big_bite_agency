@@ -47,7 +47,7 @@ class InvoiceController extends Controller
 
         $saleparson = Invoice::join('customers', 'invoices.customer', '=', 'customers.id')
         ->join('users', 'invoices.assign', '=', 'users.id')
-        ->select('invoices.*', 'customers.name as customers_name' , 'users.full_name as assign_name')
+        ->select('invoices.*', 'customers.firm as customers_name' , 'users.full_name as assign_name')
         ->get();
 
         return response()->json(['data' => $saleparson]);

@@ -22,7 +22,7 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Invoice</th>
-                                    <th>Customer Name</th>
+                                    <th>Firm Name</th>
                                     <th>Assign To</th>
                                     <th>Amount</th>
                                     <th>Payment</th>
@@ -61,13 +61,13 @@
                     <div class="col-md-12 mb-3">
                         <label for="customer" class="form-label">Customer Name 
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModalCustomer">
-                                Add Customer
+                                Add Firm
                             </button>
                         </label>
                         <select id="customer" class="form-select">
-                            <option value="">Select Customer</option>
+                            <option value="">Select Firm</option>
                             @foreach ($customers as $customer)
-                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                <option value="{{ $customer->id }}">{{ $customer->firm }}</option>
                             @endforeach
                         </select>
                         <small class="error-text text-danger"></small>
