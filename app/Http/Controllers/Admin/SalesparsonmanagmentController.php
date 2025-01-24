@@ -25,9 +25,11 @@ class SalesparsonmanagmentController extends Controller
 
         $compId = $user->firm_id;
 
+        $salesparsons = User::where('status','active')->where('role','salesparson')->get();
+
         $location = User::where('role','user')->orderBy('id', 'desc')->get();
         // Pass the company and comId to the view
-        return view('admin.salesparson.index', compact('location'));
+        return view('admin.salesparson.index', compact('location','salesparsons'));
     }
 
     /**

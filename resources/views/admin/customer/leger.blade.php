@@ -74,9 +74,6 @@
     
         // Trigger the print dialog
         printWindow.print();
-    
-        // Close the window after printing (optional)
-        printWindow.close();
     });    
 </script>
 

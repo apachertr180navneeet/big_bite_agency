@@ -55,6 +55,21 @@
                 <script src="{{asset('assets/admin/js/dashboards-analytics.js')}}"></script>
                 <script src="{{asset('assets/admin/js/moment.min.js')}}"></script>
                 <script async defer src="https://buttons.github.io/buttons.js"></script>
+                <!-- DataTables JS -->
+                <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+                <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+                <!-- JSZip for Excel Export -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+                <!-- PDFMake for PDF Export -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+
+                <!-- Buttons for HTML5 Export -->
+                <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+
+                <!-- Buttons for Print Export -->
+                <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
                 @yield('script')
                 @include('admin.layouts.elements.sweet_alerts')
             </div>

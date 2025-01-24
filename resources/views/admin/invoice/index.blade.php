@@ -16,6 +16,25 @@
         <div class="col-xl-12 col-lg-12">
             <div class="card">
                 <div class="card-body">
+                    {{--  <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="startDate">Start Date:</label>
+                            <input type="date" id="startDate" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="endDate">End Date:</label>
+                            <input type="date" id="endDate" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="assignNameFilter">Assigned Name:</label>
+                            <select id="assignNameFilter" class="form-select">
+                                <option value="">All</option>
+                                @foreach ($salesparsons as $salesparson)
+                                    <option value="{{ $salesparson->full_name }}">{{ $salesparson->full_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>  --}}
                     <div class="table-responsive text-nowrap">
                         <table class="table table-bordered" id="branchTable">
                             <thead>
@@ -293,6 +312,55 @@
                 },
 
             ],
+            dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: [
+                {
+                    extend: "excelHtml5",
+                    title: "Invoice Data",
+                    className: "btn btn-success",
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5], // Include only specific columns (0-based index)
+                    },
+                },
+                {
+                    extend: "pdfHtml5",
+                    title: "Invoice Data",
+                    className: "btn btn-danger",
+                    orientation: "landscape",
+                    pageSize: "A4",
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5], // Include only specific columns
+                    },
+                },
+            ],
+        });
+
+        // Custom date range filter
+        $.fn.dataTable.ext.search.push((settings, data, dataIndex) => {
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+            const date = data[0]; // Date column index
+
+            if (startDate && new Date(date) < new Date(startDate)) {
+                return false;
+            }
+            if (endDate && new Date(date) > new Date(endDate)) {
+                return false;
+            }
+            return true;
+        });
+
+        // Assign name filter
+        $('#assignNameFilter').on('change', function () {
+            const selectedName = $(this).val();
+            table.column(3).search(selectedName).draw(); // Assign To column index
+        });
+
+        // Trigger filters
+        $('#startDate, #endDate').on('change', function () {
+            table.draw();
         });
 
         // Handle form submission via AJAX
