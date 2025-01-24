@@ -215,10 +215,12 @@ class CustomerController extends Controller
                 'description' => "Sales Invoice " .$invoiceValue->invoice,
                 'bill' => $invoiceValue->amount,
                 'receipt' => '0',
+                'discount' => '0',
             ];
 
             // Update the total invoice amount
             $totalInvoice += $invoiceValue->amount;
+            
 
             // Fetch related receipts
             $receiptLists = Receipt::where('bill_id', $invoiceValue->id)->get();
@@ -228,10 +230,11 @@ class CustomerController extends Controller
                     'description' => "Recepit Voucher " . $receiptValue->receipt,
                     'bill' => '0',
                     'receipt' => $receiptValue->amount,
+                    'discount' => $receiptValue->discount,
                 ];
 
                 // Update the total receipt amount
-                $totalReceipt += $receiptValue->amount;
+                $totalReceipt += $receiptValue->amount + $receiptValue->discount;
             }
         }
 

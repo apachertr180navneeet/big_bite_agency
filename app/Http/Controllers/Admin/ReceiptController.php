@@ -33,7 +33,11 @@ class ReceiptController extends Controller
 
         $lastReceipt = Receipt::latest('id')->first();
 
-        $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
+        if($lastReceipt){
+            $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
+        }else{
+            $newReceipt = sprintf('%04d', intval(1));
+        }
 
 
         // Pass the data to the view

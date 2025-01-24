@@ -27,6 +27,7 @@
                                     <th>Description</th>
                                     <th>Bill</th>
                                     <th>Receipt</th>
+                                    <th>Discount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -36,6 +37,7 @@
                                         <td>{{ htmlspecialchars($ledger['description'], ENT_QUOTES, 'UTF-8') }}</td>
                                         <td>{{ number_format($ledger['bill'], 2) }}</td>
                                         <td>{{ number_format($ledger['receipt'], 2) }}</td>
+                                        <td>{{ number_format($ledger['discount'], 2) }}</td>
                                     </tr>
                                 @endforeach
                                 <tr>

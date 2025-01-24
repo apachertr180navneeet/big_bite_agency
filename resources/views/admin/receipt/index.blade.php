@@ -117,11 +117,16 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="discount" class="form-label">Discount</label>
-                        <input type="text" id="givendiscount" class="form-control" placeholder="Enter Discount" value="0.00"/>
-                        <input type="hidden" id="discount" class="form-control" placeholder="Enter Discount"/>
+                        <input type="hidden" id="givendiscount" class="form-control" placeholder="Enter Discount" value="0.00"/>
+                        <input type="text" id="discount" class="form-control" placeholder="Enter Discount" readonly/>
                         <input type="hidden" id="final_amount" class="form-control" placeholder="Enter Final Amount"/>
                         <input type="hidden" id="remaing_amount" class="form-control" placeholder="Enter Remaing Amount"/>
                         <small id= "error-message" class="error-text text-danger"></small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="cal_amount" class="form-label">Amount</label>
+                        <input type="text" id="cal_amount" class="form-control" placeholder="Enter Amount"/>
+                        <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="sales_parson" class="form-label">Sales Parson</label>
@@ -183,14 +188,16 @@
     
                     // Calculate the remaining amount
                     var remainingAmount = finalAmount - givenamount;
+
+                    //var FainalAmount = finalAmount - givenamount;
     
                     // Set values in the form fields
                     //$('#customer').val(data.customers_name);
                     $('#sales_parson').val(data.assign_name);
-                    $('#amount').val(data.amount);
+                    $('#amount').val(amount);
                     $('#discount').val(discountAmount); // Use the rounded discount amount here
-                    $('#final_amount').val(finalAmount);
-                    $('#given_amount').val(givenamount);
+                    $('#final_amount').val(remainingAmount);
+                    $('#given_amount').val('0');
                     $('#remaing_amount').val(remainingAmount);
                 },
                 error: function (xhr) {
@@ -356,7 +363,7 @@
                 date: $('#date').val(),
                 receipt: $('#receipt').val(),
                 bill_id: $('#bill_id').val(),
-                amount: $('#given_amount').val(),
+                amount: $('#cal_amount').val(),
                 discount: $('#discount').val(),
                 remaing_amount: $('#remaing_amount').val(),
                 full_payment: $('#full_payment').val(),
@@ -563,6 +570,21 @@
                 })
                 .catch(error => console.error('Error fetching invoices:', error));
         }
+    }
+
+    document.getElementById('given_amount').addEventListener('input', calculateAmount);
+    document.getElementById('discount').addEventListener('input', calculateAmount);
+
+    function calculateAmount() {
+        // Get the values from the input fields
+        const givenAmount = parseFloat(document.getElementById('given_amount').value) || 0;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+        // Calculate the remaining amount
+        const calculatedAmount = givenAmount - discount;
+
+        // Update the cal_amount field
+        document.getElementById('cal_amount').value = calculatedAmount.toFixed(2);
     }
 </script>
 @endsection
