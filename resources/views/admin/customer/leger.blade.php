@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-6 text-start">
             <h5 class="py-2 mb-2">
-                <span class="text-primary fw-light">Customer</span>
+                <span class="text-primary fw-light">Lager</span>
             </h5>
         </div>
         <div class="col-md-6 text-end">
@@ -16,8 +16,8 @@
                 <div class="card-body">
                     <div class="row ">
                         <h4 class="text-center">Firm :- {{ $customerDetail->firm }}</h4>
-                        <h4 class="text-center">Customer :- {{ $customerDetail->name }}</h4>
-                        <h4 class="text-center">Address :- {{ $customerDetail->phone }}</h4>
+                        {{--  <h4 class="text-center">Customer :- {{ $customerDetail->name }}</h4>  --}}
+                        <h4 class="text-center">Mobile :- {{ $customerDetail->phone }}</h4>
                     </div>
                     <div class="table-responsive text-nowrap">
                         <table class="table table-bordered" id="branchTable">

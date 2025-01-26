@@ -115,8 +115,68 @@
                 <div class="col-lg-12 col-md-12 col-6 mb-4">
                     <div class="card">
                         <div class="card-body text-center">
-                            <h5 class="fw-medium d-block mb-1">Total Collection</h5>
+                            <h5 class="fw-medium d-block mb-1">Total Bill Amount</h5>
                             <p class="card-title mb-2">Total - {{ $totalAmount }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 order-1">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-6 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="fw-medium d-block mb-1">Today Bill</h5>
+                            <p class="card-title mb-2">Total - {{ $todayCount }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 order-1">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-6 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="fw-medium d-block mb-1">Today Bill Amount</h5>
+                            <p class="card-title mb-2">Total - {{ $todayAmount }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 order-1">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-6 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="fw-medium d-block mb-1">Total Approved Receipt</h5>
+                            <p class="card-title mb-2">Total - {{ $receiptActiveCount }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 order-1">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-6 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="fw-medium d-block mb-1">Total Unaproved Receipt</h5>
+                            <p class="card-title mb-2">Total - {{ $receiptInactiveCount }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 order-1">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-6 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="fw-medium d-block mb-1">Total OutStanding</h5>
+                            <p class="card-title mb-2">Total - {{ $totalAmount - ($receipttotalAmount + $receiptdiscunttotalAmount) }}</p>
                         </div>
                     </div>
                 </div>

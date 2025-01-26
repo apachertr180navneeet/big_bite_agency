@@ -296,9 +296,10 @@ class AdminAuthController extends Controller
 
         // Retrieve invoice counts
         $invoiceCounts = [
-            'totalBill' => Invoice::where('payment', 'pending')->count(),
-            'totalAmount' => Invoice::where('payment', 'pending')->sum('amount'),
+            'totalBill' => Invoice::count(),
+            'totalAmount' => Invoice::sum('amount'),
             'today' => Invoice::whereDate('created_at', $dateOnly)->count(),
+            'todayAmount' => Invoice::whereDate('created_at', $dateOnly)->sum('amount'),
             'currentMonth' => Invoice::whereMonth('created_at', $currentMonth)
                 ->whereYear('created_at', $currentYear)
                 ->count(),
@@ -311,6 +312,8 @@ class AdminAuthController extends Controller
             ")->first(),
 
             'totalBill' => Receipt::count(),
+            'totalAmount' => Receipt::sum('amount'),
+            'discunttotalAmount' => Receipt::sum('discount'),
             'today' => Receipt::whereDate('created_at', $dateOnly)->count(),
             'currentMonth' => Receipt::whereMonth('created_at', $currentMonth)
                 ->whereYear('created_at', $currentYear)
@@ -326,6 +329,7 @@ class AdminAuthController extends Controller
             'totalUserActive' => $totalUserActive,
             'totalUserInactive' => $totalUserInactive,
             'todayCount' => $invoiceCounts['today'],
+            'todayAmount' => $invoiceCounts['todayAmount'],
             'currentMonthCount' => $invoiceCounts['currentMonth'],
             'totalBill'=> $invoiceCounts['totalBill'],
             'totalAmount'=> $invoiceCounts['totalAmount'],
@@ -334,6 +338,8 @@ class AdminAuthController extends Controller
             'receipttodayCount' => $receiptCounts['today'],
             'receiptcurrentMonthCount' => $receiptCounts['currentMonth'],
             'receipttotalBill'=> $receiptCounts['totalBill'],
+            'receipttotalAmount'=> $receiptCounts['totalAmount'],
+            'receiptdiscunttotalAmount'=> $receiptCounts['discunttotalAmount'],
         ]);
     }
 

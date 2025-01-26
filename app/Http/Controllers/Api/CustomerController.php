@@ -130,14 +130,15 @@ class CustomerController extends Controller
 
             // Apply search filters for name, phone, and city if provided
             if ($request->has('name') && !empty($request->name)) {
-                $query->where('customers.name', 'like', '%' . $request->name . '%');
+                $query->orWhere('customers.name', 'like', '%' . $request->name . '%');
             }
-            if ($request->has('phone') && !empty($request->phone)) {
-                $query->where('customers.phone', 'like', '%' . $request->phone . '%');
+            if ($request->has('name') && !empty($request->name)) {
+                $query->orWhere('customers.phone', 'like', '%' . $request->name . '%');
             }
-            if ($request->has('city') && !empty($request->city)) {
-                $query->where('customers.city', 'like', '%' . $request->city . '%');
+            if ($request->has('name') && !empty($request->name)) {
+                $query->orWhere('customers.city', 'like', '%' . $request->name . '%');
             }
+            
 
             // Paginate the results
             $invoices = $query->paginate($perPage);
