@@ -344,11 +344,52 @@ class CustomerController extends Controller
             ];
             $receipt = Receipt::create($dataUser);
 
+            $invoice = Invoice::find($request->bill_id);
+
+            $customer = Customer::find($invoice->customer);
+
+            $customerDetails = [
+                'id' => $customer->id,
+                'name' => $customer->firm,
+                'city' => $customer->city,
+                'phone' => $customer->phone,
+            ];
+
+            $ledgerData[] = [
+                'date' => $request->date,
+                'description' => "Receipt Number " . $newReceipt,
+                'receipt' => $request->amount,
+                'discount' => $request->discount,
+            ];
+
+            usort($ledgerData, function ($a, $b) {
+                return strtotime($a['date']) - strtotime($b['date']);
+            });
+
+            // Generate the PDF using the 'ledger-pdf' view
+            $pdf = Pdf::loadView('recept-pdf', compact('customerDetails', 'ledgerData'));
+
+            // Define the file path to save the PDF in the public/uploads folder
+            $filePath = public_path('uploads/receipt_' . $newReceipt . '_' . time() . '.pdf');
+
+            // Ensure the uploads directory exists
+            if (!file_exists(public_path('uploads'))) {
+                mkdir(public_path('uploads'), 0755, true);
+            }
+
+            // Save the PDF to the specified path
+            $pdf->save($filePath);
+
+            // Generate the URL for the saved PDF
+            $pdfUrl = asset('uploads/' . basename($filePath));
+
+
             // Return the response with the customer data
             return response()->json([
                 'status' => true,
                 'message' => 'Recept Created Succesfully.',
-                'invoic_detail' => $receipt
+                'invoic_detail' => $receipt,
+                'pdf_url' => $pdfUrl
             ], 200);
 
         } catch (Exception $e) {
