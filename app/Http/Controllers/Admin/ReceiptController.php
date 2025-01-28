@@ -210,16 +210,54 @@ class ReceiptController extends Controller
     }
 
     // Get invoice details
-    public function detail(Request $request){
-        $id = $request->id;
-        $invoice = Invoice::where('invoices.id', $id)
+    public function detail(Request $request)
+    {
+        // Validate the request to ensure 'invoice' is present
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        $invoiceId = $request->id;
+
+        // Query to fetch the invoice with joins
+        $invoice = Invoice::where('invoices.id', $invoiceId)
             ->join('users', 'invoices.assign', '=', 'users.id')
             ->join('customers', 'invoices.customer', '=', 'customers.id')
             ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id')
-            ->select('invoices.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id' , 'receipts.amount as receipts_amount' , 'receipts.remaing_amount as remaing_amount', 'invoices.assign as assign_id', 'customers.name as customers_name' , 'customers.discount as customers_discount' , 'users.full_name as assign_name')
+            ->select(
+                'invoices.*',
+                'invoices.invoice as bill_number',
+                'invoices.customer as customers_id',
+                'invoices.assign as assign_id',
+                'customers.name as customers_name',
+                'customers.discount as customers_discount',
+                'users.full_name as assign_name'
+            )
             ->first();
+
+        // Check if invoice was found
+        if (!$invoice) {
+            return response()->json([
+                'message' => 'Invoice not found.',
+            ], 404);
+        }
+
+        // Calculate receipt totals
+        $receiptAmountTotal = Receipt::where('bill_id', $invoiceId)->sum('amount');
+        $receiptDiscountTotal = Receipt::where('bill_id', $invoiceId)->sum('discount');
+
+        // Calculate discount amount
+        $discountAmount = $invoice->amount * ($invoice->customers_discount / 100);
+
+        // Adjust the invoice amount
+        $invoice['amount'] -= ($receiptAmountTotal + $receiptDiscountTotal);
+
+        // Determine max discount amount
+        $invoice["max_discount_amount"] = $receiptAmountTotal == 0 ? $discountAmount : 0;
+
         return response()->json($invoice);
     }
+
 
     public function getPendingInvoices($customerId)
     {

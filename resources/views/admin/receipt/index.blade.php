@@ -24,10 +24,10 @@
                             <label for="startDate">Start Date:</label>
                             <input type="date" id="startDate" class="form-control">
                         </div>
-                        {{--  <div class="col-md-3">
+                        <div class="col-md-3">
                             <label for="endDate">End Date:</label>
                             <input type="date" id="endDate" class="form-control">
-                        </div>  --}}
+                        </div>
                         <div class="col-md-3">
                             <label for="assignNameFilter">Assigned Name:</label>
                             <select id="assignNameFilter" class="form-select">
@@ -175,7 +175,7 @@
                     var discountAmount = (discount / 100) * amount;
     
                     // Round the discount amount to 2 decimal places
-                    discountAmount = discountAmount.toFixed(2);
+                    discountAmount = data.max_discount_amount.toFixed(2);
     
                     // Calculate the final amount after applying the discount
                     var finalAmount = amount - discountAmount;
@@ -282,7 +282,7 @@
                 {
                     data: "action",
                     render: (data, type, row) => {
-                        if (row.status === "inactive") {
+                        //if (row.status === "inactive") {
                             @if ($user->role == 'admin')
                                 const statusButton = row.status === "inactive"
                                 ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
@@ -296,9 +296,9 @@
                             //const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
 
                             return `${statusButton} ${deleteButton}`;
-                        }else{
-                            return 'After Completing payment Action not avalable';
-                        }
+                        //}else{
+                            //return 'After Completing payment Action not avalable';
+                        //}
                     },
                 },
 
@@ -331,15 +331,15 @@
         // Custom date range filter
         $.fn.dataTable.ext.search.push((settings, data, dataIndex) => {
             const startDate = $('#startDate').val();
-            //const endDate = $('#endDate').val();
+            const endDate = $('#endDate').val();
             const date = data[0]; // Date column index
-            console.log('Start Date:', startDate, 'Table Date:', date);
-            if (startDate && date != startDate) {
+
+            if (startDate && new Date(date) < new Date(startDate)) {
                 return false;
             }
-            //if (endDate && new Date(date) > new Date(endDate)) {
-              //  return false;
-            //}
+            if (endDate && new Date(date) > new Date(endDate)) {
+                return false;
+            }
             return true;
         });
 
@@ -350,7 +350,8 @@
         });
 
         // Trigger filters
-        $('#startDate').on('change', function () {
+        // Trigger filters
+        $('#startDate, #endDate').on('change', function () {
             table.draw();
         });
 

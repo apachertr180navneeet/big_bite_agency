@@ -16,7 +16,7 @@
         <div class="col-xl-12 col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    {{--  <div class="row mb-3">
+                    <div class="row mb-3">
                         <div class="col-md-3">
                             <label for="startDate">Start Date:</label>
                             <input type="date" id="startDate" class="form-control">
@@ -34,7 +34,7 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>  --}}
+                    </div>
                     <div class="table-responsive text-nowrap">
                         <table class="table table-bordered" id="branchTable">
                             <thead>
@@ -78,7 +78,7 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="customer" class="form-label">Customer Name 
+                        <label for="customer" class="form-label">Firm Name 
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModalCustomer">
                                 Add Firm
                             </button>

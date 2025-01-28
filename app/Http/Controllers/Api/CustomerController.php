@@ -28,46 +28,38 @@ class CustomerController extends Controller
             $perPage = 10;
 
             // Fetch invoices with the necessary joins and conditions
-            // Filtering by the authenticated user's assigned invoices with 'pending' payment status
             $invoices = Invoice::where('invoices.assign', $id)
                 ->where('invoices.payment', 'pending') // Only 'pending' invoices
-                ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table to fetch assigned user info
-                ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table to fetch customer info
-                ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id') // Left join with 'receipts' to get payment details (if available)
+                ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
+                ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
                 ->select(
-                    'customers.id as customer_id', // Select customer ID
-                    'customers.name as customers_name', // Select customer name
-                    'customers.city as customers_city', // Select customer city
-                    'customers.phone as customers_phone', // Select customer phone
-                    DB::raw('COUNT(invoices.id) as pending_invoices_count'), // Count the number of pending invoices for each customer
-                    DB::raw('SUM(COALESCE(receipts.remaing_amount, invoices.amount)) as due') // Calculate the due amount (sum of remaining amount or invoice amount)
+                    'customers.id as customer_id',
+                    'customers.firm as customers_name',
+                    'customers.city as customers_city',
+                    'customers.phone as customers_phone',
+                    DB::raw('COUNT(invoices.id) as total_invoices'), // Total invoices count
+                    DB::raw('SUM(invoices.amount) as total_invoice_amount') // Total invoice amount
                 )
-                ->groupBy(
-                    'customers.id', // Group by customer ID
-                    'customers.name', // Group by customer name
-                    'customers.city', // Group by customer city
-                    'customers.phone' // Group by customer phone
-                )
-                ->paginate($perPage); // Paginate the results (10 items per page)
+                ->groupBy('customers.id', 'customers.name', 'customers.city', 'customers.phone') // Group by customer
+                ->paginate($perPage);
 
-            // If no invoices are found, return a 'Customer not found' response
-            if ($invoices->isEmpty()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Customer not found.',
-                ], 200);
-            }
-
-            // Map the invoice data to a simpler structure for the response
-            // Each invoice contains customer details and the pending invoice count/due amount
+            // Calculate the due amount for each customer
             $invoiceData = $invoices->map(function ($invoice) {
+                // Fetch total receipts for this customer
+                $receiptData = Receipt::whereHas('invoice', function ($query) use ($invoice) {
+                    $query->where('customer', $invoice->customer_id);
+                })->selectRaw('SUM(amount + IFNULL(discount, 0)) as total_receipts')
+                ->first();
+
+                $totalReceipts = $receiptData->total_receipts ?? 0;
+
                 return [
-                    'customer_id' => $invoice->customer_id, // Customer ID
-                    'customers_name' => $invoice->customers_name, // Customer name
-                    'customers_city' => $invoice->customers_city, // Customer city
-                    'customers_phone' => $invoice->customers_phone, // Customer phone
-                    'due' => $invoice->due, // Due amount
-                    'total_bill' => $invoice->pending_invoices_count, // Total number of pending invoices
+                    'customer_id' => $invoice->customer_id,
+                    'customers_name' => $invoice->customers_name,
+                    'customers_city' => $invoice->customers_city,
+                    'customers_phone' => $invoice->customers_phone,
+                    'total_bill' => $invoice->total_invoices,
+                    'due' => $invoice->total_invoice_amount - $totalReceipts,
                 ];
             });
 
@@ -75,17 +67,17 @@ class CustomerController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Customers found successfully.',
-                'customer' => $invoiceData, // Customer data (transformed)
+                'customer' => $invoiceData,
                 'pagination' => [
-                    'current_page' => $invoices->currentPage() ?: "", 
-                    'total_pages' => $invoices->lastPage() ?: "", 
-                    'total_items' => $invoices->total() ?: "", 
-                    'items_per_page' => $invoices->perPage() ?: "", 
-                    'current_url' => $invoices->url($invoices->currentPage()) ?: "", 
-                    'last_url' => $invoices->url($invoices->lastPage()) ?: "", 
-                    'previous_url' => $invoices->previousPageUrl() ?: "", 
-                    'next_url' => $invoices->nextPageUrl() ?: "", 
-                    'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : "",
+                    'current_page' => $invoices->currentPage(),
+                    'total_pages' => $invoices->lastPage(),
+                    'total_items' => $invoices->total(),
+                    'items_per_page' => $invoices->perPage(),
+                    'current_url' => $invoices->url($invoices->currentPage()),
+                    'last_url' => $invoices->url($invoices->lastPage()),
+                    'previous_url' => $invoices->previousPageUrl(),
+                    'next_url' => $invoices->nextPageUrl(),
+                    'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : null,
                 ],
             ], 200);
 
@@ -93,10 +85,11 @@ class CustomerController extends Controller
             // Return a response with error details in case of any exception
             return response()->json([
                 'status' => false,
-                'message' => 'An error occurred: ' . $e->getMessage(), // Include the exception message
-            ], 500); // Return a 500 internal server error status
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
         }
     }
+
 
     public function customerSearch(Request $request)
     {
@@ -110,34 +103,22 @@ class CustomerController extends Controller
             // Initialize the query for invoices
             $query = Invoice::where('invoices.assign', $id)
                 ->where('invoices.payment', 'pending') // Only 'pending' invoices
-                ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table to fetch assigned user info
-                ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table to fetch customer info
-                ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id') // Left join with 'receipts' to get payment details (if available)
+                ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
+                ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
                 ->select(
-                    'customers.id as customer_id', // Select customer ID
-                    'customers.name as customers_name', // Select customer name
-                    'customers.city as customers_city', // Select customer city
-                    'customers.phone as customers_phone', // Select customer phone
-                    DB::raw('COUNT(invoices.id) as pending_invoices_count'), // Count the number of pending invoices for each customer
-                    DB::raw('SUM(COALESCE(receipts.remaing_amount, invoices.amount)) as due') // Calculate the due amount (sum of remaining amount or invoice amount)
+                    'customers.id as customer_id',
+                    'customers.firm as customers_name',
+                    'customers.city as customers_city',
+                    'customers.phone as customers_phone',
+                    DB::raw('COUNT(invoices.id) as total_invoices'), // Total invoices count
+                    DB::raw('SUM(invoices.amount) as total_invoice_amount') // Total invoice amount
                 )
-                ->groupBy(
-                    'customers.id', // Group by customer ID
-                    'customers.name', // Group by customer name
-                    'customers.city', // Group by customer city
-                    'customers.phone' // Group by customer phone
-                );
+                ->groupBy('customers.id', 'customers.name', 'customers.city', 'customers.phone'); // Group by customer
 
             // Apply search filters for name, phone, and city if provided
-            if ($request->has('name') && !empty($request->name)) {
-                $query->orWhere('customers.name', 'like', '%' . $request->name . '%');
-            }
-            if ($request->has('name') && !empty($request->name)) {
+                $query->Where('customers.name', 'like', '%' . $request->name . '%');
                 $query->orWhere('customers.phone', 'like', '%' . $request->name . '%');
-            }
-            if ($request->has('name') && !empty($request->name)) {
                 $query->orWhere('customers.city', 'like', '%' . $request->name . '%');
-            }
             
 
             // Paginate the results
@@ -153,13 +134,21 @@ class CustomerController extends Controller
 
             // Map the invoice data to a simpler structure for the response
             $invoiceData = $invoices->map(function ($invoice) {
+                // Fetch total receipts for this customer
+                $receiptData = Receipt::whereHas('invoice', function ($query) use ($invoice) {
+                    $query->where('customer', $invoice->customer_id);
+                })->selectRaw('SUM(amount + IFNULL(discount, 0)) as total_receipts')
+                ->first();
+
+                $totalReceipts = $receiptData->total_receipts ?? 0;
+
                 return [
-                    'customer_id' => $invoice->customer_id, // Customer ID
-                    'customers_name' => $invoice->customers_name, // Customer name
-                    'customers_city' => $invoice->customers_city, // Customer city
-                    'customers_phone' => $invoice->customers_phone, // Customer phone
-                    'due' => $invoice->due, // Due amount
-                    'total_bill' => $invoice->pending_invoices_count, // Total number of pending invoices
+                    'customer_id' => $invoice->customer_id,
+                    'customers_name' => $invoice->customers_name,
+                    'customers_city' => $invoice->customers_city,
+                    'customers_phone' => $invoice->customers_phone,
+                    'total_bill' => $invoice->total_invoices,
+                    'due' => $invoice->total_invoice_amount - $totalReceipts,
                 ];
             });
 
@@ -193,57 +182,72 @@ class CustomerController extends Controller
     public function customerReceipt(Request $request)
     {
         try {
-            // Get the authenticated user's ID
             $id = auth()->user()->id;
 
-            // Filtering by the authenticated user's assigned invoices with 'pending' payment status
+            // Aggregate the total amount of pending invoices for the customer
+            $invoiceSummary = Invoice::where('invoices.assign', $id)
+                ->where('invoices.payment', 'pending') // Only 'pending' invoices
+                ->where('invoices.customer', $request->customer)
+                ->groupBy('invoices.customer') // Group by customer
+                ->select(
+                    DB::raw('SUM(COALESCE(invoices.amount, 0)) as totalamount') // Sum the amounts
+                )
+                ->first(); // Get the aggregated result
+
+            $totalamount =  0;
+            $discount = 0;
+            $recivedamount = 0;
+            $invoicetotal = 0;
+
+            // Get all matching invoices
             $invoices = Invoice::where('invoices.assign', $id)
                 ->where('invoices.payment', 'pending') // Only 'pending' invoices
                 ->where('invoices.customer', $request->customer)
-                ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id') // Left join with 'receipts' to get payment details (if available)
-                ->select(
-                    DB::raw('SUM(COALESCE(receipts.remaing_amount, invoices.amount)) as due') // Calculate the due amount (sum of remaining amount or invoice amount)
-                )
-                ->first(); // Get the first result (since we're expecting a single result)
+                ->get();
 
-                $invoicesLists = Invoice::where('invoices.assign', $id)
-                ->where('invoices.payment', 'pending') // Only 'pending' invoices
-                ->where('invoices.customer', $request->customer)
-                ->get(); // Get all matching invoices
+            foreach ($invoices as $invoicevalue) {
+                $recept = Receipt::where('bill_id', $invoicevalue->id)->get();
 
-                $invoiceBillNumber = [];  // Initialize the array to store invoice details
-
-                foreach ($invoicesLists as $key => $value) {
-                    $invoiceBillNumber[] = [
-                        'invoice_id' => $value->id,
-                        'invoice' => $value->invoice,  // Store the bill number
-                    ];
+                foreach ($recept as $receptvalue) {
+                    $discount += $receptvalue->discount;
+                    $totalamount += $receptvalue->amount;
                 }
 
-            // If no invoices are found, return a 'Customer not found' response
-            if (!$invoices) {
+                $invoicetotal += $invoicevalue->amount;
+            }
+
+            $recivedamount = $totalamount + $discount;
+            $due = $invoicetotal - $recivedamount;
+
+            $invoiceBillNumber = [];
+            foreach ($invoices as $value) {
+                $invoiceBillNumber[] = [
+                    'invoice_id' => $value->id,
+                    'invoice' => $value->invoice,
+                ];
+            }
+
+            if (!$invoices->count()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Customer not found.',
                 ], 200);
             }
 
-            // Return the response with the customer data
             return response()->json([
                 'status' => true,
                 'message' => 'Customer found successfully.',
-                'remaining_amount' => $invoices->due, // Return the due amount
+                'remaining_amount' => $due,
                 'invoic_list' => $invoiceBillNumber
             ], 200);
-
         } catch (Exception $e) {
-            // Return a response with error details in case of any exception
             return response()->json([
                 'status' => false,
-                'message' => 'An error occurred: ' . $e->getMessage(), // Include the exception message
-            ], 500); // Return a 500 internal server error status
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
         }
     }
+
 
     public function customerInvoiceDetail(Request $request)
     {
@@ -255,12 +259,18 @@ class CustomerController extends Controller
                 ->join('users', 'invoices.assign', '=', 'users.id')
                 ->join('customers', 'invoices.customer', '=', 'customers.id')
                 ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id')
-                ->select('invoices.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id', 'invoices.assign as assign_id', 'customers.name as customers_name' , 'customers.discount as customers_discount' , 'users.full_name as assign_name')
+                ->select('invoices.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id', 'invoices.assign as assign_id', 'customers.firm as customers_name' , 'customers.discount as customers_discount' , 'users.full_name as assign_name')
                 ->first();
-
+                $receiptamounttotal = Receipt::where('bill_id', $request->invoice)->sum('amount');
+                $receiptdiscounttotal = Receipt::where('bill_id', $request->invoice)->sum('discount');
                 $discountAmount = $invoice->amount * ($invoice->customers_discount / 100);
-                
-                $invoice["max_discount_amount"] = $discountAmount;
+
+                $invoice['amount'] = $invoice['amount'] - ($receiptamounttotal + $receiptdiscounttotal);
+                if ($receiptamounttotal == '0') {
+                    $invoice["max_discount_amount"] = $discountAmount;
+                }else{ 
+                    $invoice["max_discount_amount"] = 0;
+                }
             // If no invoices are found, return a 'Customer not found' response
             if (!$invoice) {
                 return response()->json([
@@ -367,7 +377,7 @@ class CustomerController extends Controller
             // Prepare customer details
             $customerDetails = [
                 'id' => $customer->id,
-                'name' => $customer->name,
+                'name' => $customer->firm,
                 'city' => $customer->city,
                 'phone' => $customer->phone,
             ];

@@ -33,4 +33,9 @@ class Receipt extends Model
 
     // Enable date casting for timestamps and soft deletes
     protected $dates = ['deleted_at'];
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'bill_id', 'id');
+    }
 }
