@@ -211,7 +211,7 @@ class CustomerController extends Controller
         foreach ($invoiceLists as $invoiceValue) {
             // Add invoice data
             $ledgerData[] = [
-                'date' => $invoiceValue->date,
+                'date' => Carbon::parse($invoiceValue->date)->format('d/m/Y'),
                 'description' => "Sales Invoice " .$invoiceValue->invoice,
                 'bill' => $invoiceValue->amount,
                 'receipt' => '0',
@@ -226,7 +226,7 @@ class CustomerController extends Controller
             $receiptLists = Receipt::where('bill_id', $invoiceValue->id)->get();
             foreach ($receiptLists as $receiptValue) {
                 $ledgerData[] = [
-                    'date' => $receiptValue->date,
+                    'date' => Carbon::parse($receiptValue->date)->format('d/m/Y'),
                     'description' => "Recepit Voucher " . $receiptValue->receipt,
                     'bill' => '0',
                     'receipt' => $receiptValue->amount,

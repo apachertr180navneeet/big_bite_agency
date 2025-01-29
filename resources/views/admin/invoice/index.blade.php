@@ -266,6 +266,11 @@
             columns: [
                 {
                     data: "date",
+                    render: (data) => {
+                        if (!data) return ""; // Handle null or undefined values
+                        const dateObj = new Date(data);
+                        return dateObj.toLocaleDateString("en-GB"); // Formats as dd/mm/yyyy
+                    },
                 },
                 {
                     data: "invoice",
@@ -343,12 +348,22 @@
             const endDate = $('#endDate').val();
             const date = data[0]; // Date column index
 
-            if (startDate && new Date(date) < new Date(startDate)) {
-                return false;
+            if (startDate) {
+                const startDateObj = new Date(startDate.split('/').reverse().join('-'));
+                const dateObj = new Date(date.split('/').reverse().join('-'));
+                if (dateObj < startDateObj) {
+                    return false;
+                }
             }
-            if (endDate && new Date(date) > new Date(endDate)) {
-                return false;
+
+            if (endDate) {
+                const endDateObj = new Date(endDate.split('/').reverse().join('-'));
+                const dateObj = new Date(date.split('/').reverse().join('-'));
+                if (dateObj > endDateObj) {
+                    return false;
+                }
             }
+
             return true;
         });
 
@@ -615,5 +630,22 @@
         window.editUser = editUser;
     });
 
+    document.addEventListener("DOMContentLoaded", function () {
+        function formatDate(inputId) {
+            let input = document.getElementById(inputId);
+            input.addEventListener("change", function () {
+                let date = new Date(this.value);
+                if (!isNaN(date.getTime())) {
+                    let formattedDate = ("0" + date.getDate()).slice(-2) + "/" + 
+                                        ("0" + (date.getMonth() + 1)).slice(-2) + "/" + 
+                                        date.getFullYear();
+                    //alert("Selected Date: " + formattedDate); // Display the formatted date
+                }
+            });
+        }
+    
+        formatDate("startDate");
+        formatDate("endDate");
+    });
 </script>
 @endsection

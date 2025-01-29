@@ -362,7 +362,7 @@ class CustomerController extends Controller
             ];
 
             $ledgerData[] = [
-                'date' => $request->date,
+                'date' => Carbon::parse($request->date)->format('d/m/Y'),
                 'description' => "Receipt Number " . $newReceipt,
                 'receipt' => $request->amount,
                 'discount' => $request->discount,
@@ -432,7 +432,7 @@ class CustomerController extends Controller
 
             // Fetch all invoices for the customer
             $invoiceLists = Invoice::where('customer', $ledgerId)
-                ->where('invoices.payment', 'pending')
+                //->where('invoices.payment', 'pending')
                 ->get();
 
             $ledgerData = []; // To store merged and sorted data
@@ -443,7 +443,7 @@ class CustomerController extends Controller
             foreach ($invoiceLists as $invoice) {
                 // Add invoice entry to ledger data
                 $ledgerData[] = [
-                    'date' => $invoice->date,
+                    'date' => Carbon::parse($invoice->date)->format('d/m/Y'),
                     'description' => "Sales Invoice " . $invoice->invoice,
                     'bill' => $invoice->amount,
                     'receipt' => '0',
@@ -456,7 +456,7 @@ class CustomerController extends Controller
                 $receiptLists = Receipt::where('bill_id', $invoice->id)->get();
                 foreach ($receiptLists as $receipt) {
                     $ledgerData[] = [
-                        'date' => $receipt->date,
+                        'date' => Carbon::parse($receipt->date)->format('d/m/Y'),
                         'description' => "Recepit Voucher " . $receipt->receipt,
                         'bill' => '0',
                         'receipt' => $receipt->amount,

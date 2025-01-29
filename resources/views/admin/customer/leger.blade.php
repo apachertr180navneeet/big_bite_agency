@@ -62,7 +62,7 @@
         var printContent = document.getElementById('divPrint').innerHTML;
     
         // Open a new window for printing
-        var printWindow = window.open('', '', 'height=600,width=800');
+        var printWindow = window.open('', '', '');
     
         // Add the content to the new window
         printWindow.document.write('<html><head><title>Print</title>');
