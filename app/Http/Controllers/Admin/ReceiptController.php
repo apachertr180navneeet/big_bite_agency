@@ -73,11 +73,28 @@ class ReceiptController extends Controller
     {
         try {
             $User = Receipt::findOrFail($request->userId);
-            if($User->full_payment == 'yes'){
-                $Bill = Invoice::findOrFail($User->bill_id);
-                $Bill->payment = 'done';
-                $Bill->save();
+
+            $totalrececitamount = Receipt::where('bill_id',$User->bill_id)->get();
+            $totalamount = 0;
+            $totalDiscount = 0;
+            $finalAmount = 0;
+            foreach ($totalrececitamount as $key => $value) {
+                $totalamount += $value->amount;
+                $totalDiscount += $value->discount;
+
+                $finalAmount  = $totalamount + $totalDiscount;
             }
+            //if($User->full_payment == 'yes'){
+                $Bill = Invoice::findOrFail($User->bill_id);
+                if($Bill->amount - $finalAmount == 0){
+                    if($Bill->payment == 'pending'){
+                        $Bill->payment = 'done';
+                    }else{
+                        $Bill->payment == 'pending';
+                    }
+                    $Bill->save();
+                }
+            //}
             $User->manager_status = 'active';
             $User->status = $request->status;
             $User->save();

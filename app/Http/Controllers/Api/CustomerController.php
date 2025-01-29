@@ -29,7 +29,7 @@ class CustomerController extends Controller
 
             // Fetch invoices with the necessary joins and conditions
             $invoices = Invoice::where('invoices.assign', $id)
-                ->where('invoices.payment', 'pending') // Only 'pending' invoices
+                //->where('invoices.payment', 'pending') // Only 'pending' invoices
                 ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
                 ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
                 ->select(
@@ -42,7 +42,7 @@ class CustomerController extends Controller
                 )
                 ->groupBy('customers.id', 'customers.name', 'customers.city', 'customers.phone') // Group by customer
                 ->paginate($perPage);
-
+                
             // Calculate the due amount for each customer
             $invoiceData = $invoices->map(function ($invoice) {
                 // Fetch total receipts for this customer
@@ -102,7 +102,7 @@ class CustomerController extends Controller
 
             // Initialize the query for invoices
             $query = Invoice::where('invoices.assign', $id)
-                ->where('invoices.payment', 'pending') // Only 'pending' invoices
+                //->where('invoices.payment', 'pending') // Only 'pending' invoices
                 ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
                 ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
                 ->select(
@@ -267,7 +267,7 @@ class CustomerController extends Controller
 
                 $invoice['amount'] = $invoice['amount'] - ($receiptamounttotal + $receiptdiscounttotal);
                 if ($receiptamounttotal == '0') {
-                    $invoice["max_discount_amount"] = $discountAmount;
+                    $invoice["max_discount_amount"] = $invoice->customers_discount;
                 }else{ 
                     $invoice["max_discount_amount"] = 0;
                 }
@@ -326,7 +326,13 @@ class CustomerController extends Controller
             $user = Auth::user();
             $lastReceipt = Receipt::latest('id')->first();
 
-            $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
+            if($lastReceipt){
+                $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
+
+            }else{
+                $newReceipt = sprintf('%04d', intval(0) + 1);
+            }
+
 
             $compId = $user->firm_id;
             // Save the User data
@@ -393,6 +399,7 @@ class CustomerController extends Controller
             ], 200);
 
         } catch (Exception $e) {
+            dd($e);
             // Return a response with error details in case of any exception
             return response()->json([
                 'status' => false,
