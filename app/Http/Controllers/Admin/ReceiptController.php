@@ -258,6 +258,7 @@ class ReceiptController extends Controller
                 'message' => 'Invoice not found.',
             ], 404);
         }
+        
 
         // Calculate receipt totals
         $receiptAmountTotal = Receipt::where('bill_id', $invoiceId)->sum('amount');
@@ -270,7 +271,7 @@ class ReceiptController extends Controller
         $invoice['amount'] -= ($receiptAmountTotal + $receiptDiscountTotal);
 
         // Determine max discount amount
-        $invoice["max_discount_amount"] = $receiptAmountTotal == 0 ? $discountAmount : 0;
+        $invoice["max_discount_amount"] = $receiptAmountTotal == 0 ? $invoice->customers_discount : 0;
 
         return response()->json($invoice);
     }

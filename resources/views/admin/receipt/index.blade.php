@@ -166,39 +166,40 @@
                 method: 'POST',
                 data: data,
                 success: function (data) {
-                    console.log(data);
-                    var discount = parseFloat(data.customers_discount) || 0; // Discount percentage (e.g., 2 for 2%)
-                    var amount = parseFloat(data.amount) || 0; // Amount (e.g., 1500000)
-                    var givenamount = parseFloat(data.receipts_amount) || 0;
+                    if(data.amount != 0){
+                        var discount = parseFloat(data.customers_discount) || 0; // Discount percentage (e.g., 2 for 2%)
+                        var amount = parseFloat(data.amount) || 0; // Amount (e.g., 1500000)
+                        var givenamount = parseFloat(data.receipts_amount) || 0;
+        
+                        // Calculate the discount amount
+                        var discountAmount = (discount / 100) * amount;
+        
+                        // Round the discount amount to 2 decimal places
+                        discountAmount = data.max_discount_amount;
+        
+                        // Calculate the final amount after applying the discount
+                        var finalAmount = amount - discountAmount;
+        
+                        // Ensure the given amount does not exceed the final amount
+                        
+        
+                        // Calculate the remaining amount
+                        var remainingAmount = finalAmount - givenamount;
     
-                    // Calculate the discount amount
-                    var discountAmount = (discount / 100) * amount;
-    
-                    // Round the discount amount to 2 decimal places
-                    discountAmount = data.max_discount_amount.toFixed(2);
-    
-                    // Calculate the final amount after applying the discount
-                    var finalAmount = amount - discountAmount;
-    
-                    // Ensure the given amount does not exceed the final amount
-                    if (givenamount > finalAmount) {
-                        alert("Given amount cannot exceed the final amount!");
-                        givenamount = finalAmount; // Adjust the given amount to the final amount
+                        //var FainalAmount = finalAmount - givenamount;
+        
+                        // Set values in the form fields
+                        //$('#customer').val(data.customers_name);
+                        $('#sales_parson').val(data.assign_name);
+                        $('#amount').val(amount);
+                        $('#givendiscount').val(discountAmount + '%'); // Use the rounded discount amount here
+                        $('#final_amount').val(remainingAmount);
+                        $('#given_amount').val('0');
+                        $('#remaing_amount').val(remainingAmount);
+                    }else{
+                        setFlash("error", "Payment Fully paid and not approved by admin .");
                     }
-    
-                    // Calculate the remaining amount
-                    var remainingAmount = finalAmount - givenamount;
 
-                    //var FainalAmount = finalAmount - givenamount;
-    
-                    // Set values in the form fields
-                    //$('#customer').val(data.customers_name);
-                    $('#sales_parson').val(data.assign_name);
-                    $('#amount').val(amount);
-                    $('#discount').val(discountAmount); // Use the rounded discount amount here
-                    $('#final_amount').val(remainingAmount);
-                    $('#given_amount').val('0');
-                    $('#remaing_amount').val(remainingAmount);
                 },
                 error: function (xhr) {
                     setFlash("error", "Invoice not found. Please try again later.");
@@ -215,11 +216,7 @@
         var finalAmount = parseFloat($('#final_amount').val()) || 0;  // Get the final amount
     
         // Ensure the given amount does not exceed the final amount
-        if (givenamount > finalAmount) {
-            alert("Given amount cannot exceed the final amount!");
-            givenamount = finalAmount;  // Adjust the given amount to the final amount
-            $(this).val(givenamount);   // Update the input field with the adjusted value
-        }
+        
     
         // Calculate the remaining amount
         var remainingAmount = finalAmount - givenamount;
@@ -594,13 +591,15 @@
     function calculateAmount() {
         // Get the values from the input fields
         const givenAmount = parseFloat(document.getElementById('given_amount').value) || 0;
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
-
+        const discount = parseFloat(document.getElementById('givendiscount').value) || 0;
+        const discountAmmount = givenAmount * (discount/100)
+        console.log(discountAmmount);
         // Calculate the remaining amount
-        const calculatedAmount = givenAmount - discount;
+        const calculatedAmount = givenAmount - discountAmmount;
 
         // Update the cal_amount field
         document.getElementById('cal_amount').value = calculatedAmount.toFixed(2);
+        document.getElementById('discount').value = discountAmmount.toFixed(2);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
