@@ -245,7 +245,7 @@
                         //const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
                         const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
 
-                        const viewLeger = `<a href="${baseUrl.replace(':id', row.id)}" class="btn btn-sm btn-success">Lager</a>`;
+                        const viewLeger = `<a href="${baseUrl.replace(':id', row.id)}" class="btn btn-sm btn-success">Ledger</a>`;
 
                         return `${statusButton} ${editButton} ${viewLeger}`;
                     },

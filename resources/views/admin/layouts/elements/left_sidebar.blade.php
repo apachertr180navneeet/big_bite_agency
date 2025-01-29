@@ -1,7 +1,10 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 	<div class="app-brand demo">
 		<a href="{{route('admin.dashboard')}}" class="app-brand-link">
-			<span class="app-brand-text demo menu-text fw-bold ms-2">Big Bite Agency</span>
+			<span class="app-brand-logo demo">
+				<img src="{{asset('assets/admin/img/bigbitelogo.png')}}" width="35%"/>
+			</span>
+			{{--  <span class="app-brand-text demo menu-text fw-bold ms-2">Big Bite Agency</span>  --}}
 		</a>
 
 		<a href="javascript:void(0);"

@@ -24,12 +24,21 @@
             margin-top: 20px;
             font-weight: bold;
         }
+        .text-center {
+            text-align: center;
+        }
+        .image_mrgin{
+            margin-left: 40%
+        }
     </style>
 </head>
 <body>
-    <p><strong>Name:</strong> {{ $customerDetails['name'] }}</p>
-    <p><strong>City:</strong> {{ $customerDetails['city'] }}</p>
-    <p><strong>Phone:</strong> {{ $customerDetails['phone'] }}</p>
+    <div class="image_mrgin">
+        <img src="{{public_path('assets/admin/img/bigbitelogo.png')}}" width="35%"/>
+    </div>
+    <p class="text-center"><strong>Name:</strong> {{ $customerDetails['name'] }}</p>
+    <p class="text-center"><strong>City:</strong> {{ $customerDetails['city'] }}</p>
+    <p class="text-center"><strong>Phone:</strong> {{ $customerDetails['phone'] }}</p>
 
     <table class="table table-bordered" id="branchTable">
         <thead>

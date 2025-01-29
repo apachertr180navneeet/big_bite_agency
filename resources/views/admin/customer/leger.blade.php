@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-6 text-start">
             <h5 class="py-2 mb-2">
-                <span class="text-primary fw-light">Lager</span>
+                <span class="text-primary fw-light">Ledger</span>
             </h5>
         </div>
         <div class="col-md-6 text-end">
@@ -14,9 +14,15 @@
         <div class="col-xl-12 col-lg-12">
             <div class="card" id="divPrint">
                 <div class="card-body">
-                    <div class="row ">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                        </div>
+                        <div class="col-md-4 text-center mb-2">
+                            <img src="{{asset('assets/admin/img/bigbitelogo.png')}}" width="35%"/>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                        </div>
                         <h4 class="text-center">Firm :- {{ $customerDetail->firm }}</h4>
-                        {{--  <h4 class="text-center">Customer :- {{ $customerDetail->name }}</h4>  --}}
                         <h4 class="text-center">Mobile :- {{ $customerDetail->phone }}</h4>
                     </div>
                     <div class="table-responsive text-nowrap">
@@ -41,7 +47,7 @@
                                     </tr>
                                 @endforeach
                                 <tr>
-                                    <td colspan="2" class="text-end"><strong>Total Due</strong></td>
+                                    <td colspan="3" class="text-end"><strong>Total Due</strong></td>
                                     <td colspan="2"><strong>{{ number_format($totalDue, 2) }}</strong></td>
                                 </tr>
                             </tbody>
@@ -62,21 +68,26 @@
         var printContent = document.getElementById('divPrint').innerHTML;
     
         // Open a new window for printing
-        var printWindow = window.open('', '', '');
+        var printWindow = window.open('', '', 'width=900,height=600');
     
-        // Add the content to the new window
+        // Add the content to the new window with proper CSS linking
         printWindow.document.write('<html><head><title>Print</title>');
-        printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">'); // Corrected CSS URL
+        printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">');
         printWindow.document.write('</head><body>');
         printWindow.document.write(printContent);
         printWindow.document.write('</body></html>');
     
-        // Close the document to apply styles and content
-        printWindow.document.close();
+        // Ensure styles are loaded before printing
+        printWindow.document.close(); // Close document to finish writing
     
-        // Trigger the print dialog
-        printWindow.print();
-    });    
+        // Wait for styles to load before printing
+        printWindow.onload = function () {
+            printWindow.focus(); // Focus the window before printing
+            printWindow.print(); // Trigger print dialog
+            //printWindow.close(); // Close the window after printing
+        };
+    });
+       
 </script>
 
 @endsection
