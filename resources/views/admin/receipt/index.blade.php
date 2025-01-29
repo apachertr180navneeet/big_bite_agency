@@ -46,10 +46,10 @@
                                     <th>Receipt No.</th>
                                     <th>Bill No.</th>
                                     <th>Amount</th>
+                                    <th>Payment Type</th>
                                     <th>Discount</th>
                                     <th>Sales Parson</th>
                                     <th>Firm</th>
-                                    <th>Full Payment</th>
                                     <th>Manager Status</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -134,10 +134,12 @@
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="full_payment" class="form-label">Full Payment</label>
-                        <select id="full_payment" class="form-select">
-                            <option value="no">No</option>
-                            <option value="yes">Yes</option>
+                        <label for="mode" class="form-label">Mode</label>
+                        <select id="mode" class="form-select">
+                            <option value="Upi">Upi</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Cash">Cash</option>
+                            <option value="RTGS">RTGS</option>
                         </select>
                         <small class="error-text text-danger"></small>
                     </div>
@@ -252,6 +254,9 @@
                     data: "amount",
                 },
                 {
+                    data: "mode",
+                },
+                {
                     data: "discount",
                 },
                 {
@@ -259,9 +264,6 @@
                 },
                 {
                     data: "customers_name",
-                },
-                {
-                    data: "full_payment",
                 },
                 {
                     data: "manager_status",
@@ -284,7 +286,7 @@
                 {
                     data: "action",
                     render: (data, type, row) => {
-                        //if (row.status === "inactive") {
+                        if (row.status === "inactive") {
                             @if ($user->role == 'admin')
                                 const statusButton = row.status === "inactive"
                                 ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
@@ -298,9 +300,9 @@
                             //const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
 
                             return `${statusButton} ${deleteButton}`;
-                        //}else{
-                            //return 'After Completing payment Action not avalable';
-                        //}
+                        }else{
+                            return 'Invoice Closed';
+                        }
                     },
                 },
 
@@ -379,7 +381,7 @@
                 amount: $('#cal_amount').val(),
                 discount: $('#discount').val(),
                 remaing_amount: $('#remaing_amount').val(),
-                full_payment: $('#full_payment').val(),
+                mode: $('#mode').val(),
                 _token: $('meta[name="csrf-token"]').attr('content') // CSRF token
             };
 

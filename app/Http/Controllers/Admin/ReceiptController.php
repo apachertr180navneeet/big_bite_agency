@@ -151,7 +151,7 @@ class ReceiptController extends Controller
             'bill_id' => 'required',
             'amount' => 'required',
             'discount' => 'required',
-            'full_payment' => 'required',
+            'mode' => 'required',
             'remaing_amount' => 'required',
         ];
 
@@ -176,7 +176,7 @@ class ReceiptController extends Controller
             'assign' => $request->assign,
             'amount' => $request->amount,
             'discount' => $request->discount,
-            'full_payment' => $request->full_payment,
+            'mode' => $request->mode,
             'remaing_amount' => $request->remaing_amount,
         ];
         Receipt::create($dataUser);
@@ -271,7 +271,7 @@ class ReceiptController extends Controller
         $invoice['amount'] -= ($receiptAmountTotal + $receiptDiscountTotal);
 
         // Determine max discount amount
-        $invoice["max_discount_amount"] = $receiptAmountTotal == 0 ? $invoice->customers_discount : 0;
+        $invoice["max_discount_amount"] = $invoice->customers_discount;
 
         return response()->json($invoice);
     }

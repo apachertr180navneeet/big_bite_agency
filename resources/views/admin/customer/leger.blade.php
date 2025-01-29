@@ -46,6 +46,14 @@
                                         <td>{{ number_format($ledger['discount'], 2) }}</td>
                                     </tr>
                                 @endforeach
+                                {{--  <tr>
+                                    <td colspan="3" class="text-end"><strong>Total Invoice</strong></td>
+                                    <td colspan="2"><strong>{{ number_format($totalInvoice, 2) }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total Receipt</strong></td>
+                                    <td colspan="2"><strong>{{ number_format($totalReceipt, 2) }}</strong></td>
+                                </tr>  --}}
                                 <tr>
                                     <td colspan="3" class="text-end"><strong>Total Due</strong></td>
                                     <td colspan="2"><strong>{{ number_format($totalDue, 2) }}</strong></td>

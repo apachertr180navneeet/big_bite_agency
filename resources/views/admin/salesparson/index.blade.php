@@ -22,8 +22,8 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Mobile</th>
-                                    <th>Alternative Number</th>
-                                    <th>Email</th>
+                                    {{--  <th>Alternative Number</th>
+                                    <th>Email</th>  --}}
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -162,12 +162,6 @@
                 },
                 {
                     data: "phone",
-                },
-                {
-                    data: "alternative_phone",
-                },
-                {
-                    data: "email",
                 },
                 {
                     data: "status",

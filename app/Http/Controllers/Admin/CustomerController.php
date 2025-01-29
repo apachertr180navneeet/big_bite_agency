@@ -167,7 +167,7 @@ class CustomerController extends Controller
                 Rule::unique('customers', 'phone')->ignore($request->id), // Ensure phone is unique, ignoring the current record
             ],
             'gst'  => [
-                'required',
+                'nullable',
                 Rule::unique('customers', 'gst')->ignore($request->id), // Ensure GST is unique, ignoring the current record
             ],
             'address1' => 'required',
