@@ -73,7 +73,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="dob" class="form-label">DOB</label>
-                        <input type="date" id="dob" class="form-control" placeholder="Enter DOB" />
+                        <input type="date" id="dob" class="form-control" placeholder="DD/MM/YYYY" />
                         <small class="error-text text-danger"></small>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -397,5 +397,16 @@
         window.editUser = editUser;
     });
 
+    {{--  document.addEventListener("DOMContentLoaded", function () {
+        const dobInput = document.getElementById("dob");
+    
+        dobInput.addEventListener("change", function () {
+            let dateValue = this.value; // YYYY-MM-DD format
+            if (dateValue) {
+                let [year, month, day] = dateValue.split("-");
+                this.value = `${day}/${month}/${year}`; // Convert to DD/MM/YYYY
+            }
+        });
+    });  --}}
 </script>
 @endsection
