@@ -286,7 +286,7 @@
                 {
                     data: "action",
                     render: (data, type, row) => {
-                        if (row.status === "inactive") {
+                        //if (row.status === "inactive") {
                             @if ($user->role == 'admin')
                                 const statusButton = row.status === "inactive"
                                 ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
@@ -300,9 +300,9 @@
                             //const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
 
                             return `${statusButton} ${deleteButton}`;
-                        }else{
-                            return 'Invoice Closed';
-                        }
+                        //}else{
+                            //return 'Invoice Closed';
+                        //}
                     },
                 },
 
