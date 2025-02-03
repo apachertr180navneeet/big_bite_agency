@@ -266,11 +266,11 @@ class CustomerController extends Controller
                 $discountAmount = $invoice->amount * ($invoice->customers_discount / 100);
 
                 $invoice['amount'] = $invoice['amount'] - ($receiptamounttotal + $receiptdiscounttotal);
-                if ($receiptamounttotal == '0') {
-                    $invoice["max_discount_amount"] = $invoice->customers_discount;
-                }else{ 
-                    $invoice["max_discount_amount"] = 0;
-                }
+                //if ($receiptamounttotal == '0') {
+                    $invoice["max_discount_amount"] = (int) $invoice->customers_discount;
+                //}else{ 
+                    //$invoice["max_discount_amount"] = 0;
+                //}
             // If no invoices are found, return a 'Customer not found' response
             if (!$invoice) {
                 return response()->json([

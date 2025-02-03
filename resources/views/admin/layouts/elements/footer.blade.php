@@ -6,8 +6,8 @@
                 document.write(new Date().getFullYear());
             </script>
             , made with ❤️ by
-            <a href="https://themeselection.com" target="_blank"
-                class="footer-link fw-medium">{{ config('app.name') }}</a>    
+            <a href="" target="_blank"
+                class="footer-link fw-medium">Big Bite Agency</a>    
         </div>
         <div class="d-none d-lg-inline-block">
             <a href="#" class="footer-link me-4"
