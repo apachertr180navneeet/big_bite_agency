@@ -7,9 +7,9 @@
             </h5>
         </div>
         <div class="col-md-3 text-center">
-            <a href="" class="btn btn-sucesse">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
                 Import Customer
-            </a>
+            </button>
         </div>
         <div class="col-md-6 text-end">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -41,6 +41,27 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Import Customers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('admin.customer.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Import</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog" role="document">

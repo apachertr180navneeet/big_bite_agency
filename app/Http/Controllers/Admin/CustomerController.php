@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CustomerImport;
+
 use Illuminate\Http\Request;
+
 
 use App\Models\{
     Customer,
@@ -250,5 +255,16 @@ class CustomerController extends Controller
 
         // Pass the ledger data and totals to the view
         return view('admin.customer.leger', compact('ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue','customerDetail'));
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        Excel::import(new CustomerImport, $request->file('file'));
+
+        return back()->with('success', 'Customers Imported Successfully!');
     }
 }

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\InvoiceImport;
+
 use App\Models\{
     Customer,
     User,
@@ -172,5 +175,16 @@ class InvoiceController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Invoice not found']);
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            Excel::import(new InvoiceImport, $request->file('file'));
+            return back()->with('success', 'Invoice Imported Successfully!');
+        } catch (\Exception $e) {
+            dd($e);
+            return back()->with('error', 'Error importing file: ' . $e->getMessage());
+        }
     }
 }

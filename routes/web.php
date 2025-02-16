@@ -104,6 +104,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 }
                 if($resource == 'customer'){
                     Route::get('lager/{id}', [$controller, 'lager'])->name('lager');
+                    Route::post('/import', [$controller, 'import'])->name('import');
+                }
+
+                if($resource == 'invoice'){
+                    Route::post('/import', [$controller, 'import'])->name('import');
                 }
             });
         }
@@ -116,3 +121,4 @@ Route::middleware(['auth'])->group(function () {
 
 
 
+// Route::post('/import-customers', [CustomerImportController::class, 'import'])->name('import.customers');
