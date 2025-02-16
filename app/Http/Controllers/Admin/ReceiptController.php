@@ -165,6 +165,16 @@ class ReceiptController extends Controller
             ]);
         }
 
+        $invoices = Invoice::where('id', $request->bill_id)->first(); // Select only necessary fields
+
+        
+        $customers = Customer::where('id', $invoices->customer)->first();
+        
+        $customerNumber = $customers->phone;
+        $customerName = $customers->name;
+        $firmName = $customers->firm;
+        $formattedDate = date('d-m-Y', strtotime($request->date));
+        
         $user = Auth::user();
 
         $compId = $user->firm_id;
@@ -180,6 +190,39 @@ class ReceiptController extends Controller
             'remaing_amount' => $request->remaing_amount,
         ];
         Receipt::create($dataUser);
+
+        // Prepare SMS details
+        $authKey = "SYSPOLYSALES";
+        $mobileNumber = $customerNumber; // Replace with actual number
+        //$message = "Your receipt has been successfully recorded. Receipt No: " . $request->receipt . ", Amount: " . $request->amount;
+        $message = "Dear $customerName, ($firmName), We have received payment today $formattedDate. Total amount of receipt is $request->amount and receipt no is $request->receipt. Thanks for your payment.";
+
+        $url = "https://wywspl.com/sendMessage.php";
+
+        $postData = [
+            'AUTH_KEY' => $authKey,
+            'phone' => $mobileNumber,
+            'message' => $message,
+        ];
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $postData,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+        ]);
+
+        $output = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            // \Log::error('SMS sending error: ' . curl_error($ch));
+            dd($ch);
+        }
+
+        curl_close($ch);
         return response()->json([
             'success' => true,
             'message' => 'Receipt saved successfully!',

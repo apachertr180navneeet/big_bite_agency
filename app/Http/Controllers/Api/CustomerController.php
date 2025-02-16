@@ -333,7 +333,6 @@ class CustomerController extends Controller
                 $newReceipt = sprintf('%04d', intval(0) + 1);
             }
 
-
             $compId = $user->firm_id;
             // Save the User data
             $dataUser = [
@@ -360,7 +359,7 @@ class CustomerController extends Controller
                 'city' => $customer->city,
                 'phone' => $customer->phone,
             ];
-
+            $formattedDate = Carbon::parse($request->date)->format('d/m/Y');
             $ledgerData[] = [
                 'date' => Carbon::parse($request->date)->format('d/m/Y'),
                 'description' => "Receipt Number " . $newReceipt,
@@ -388,6 +387,38 @@ class CustomerController extends Controller
 
             // Generate the URL for the saved PDF
             $pdfUrl = asset('uploads/' . basename($filePath));
+
+            // Prepare SMS details
+            $authKey = "SYSPOLYSALES";
+            $mobileNumber = $customer->phone; // Replace with actual number
+            //$message = "Your receipt has been successfully recorded. Receipt No: " . $newReceipt . ", Amount: " . $request->amount;
+            $message = "Dear $customer->firm, We have received payment today $formattedDate. Total amount of receipt is $request->amount and receipt no is $newReceipt. Thanks for your payment.";
+
+            $url = "https://wywspl.com/sendMessage.php";
+
+            $postData = [
+                'AUTH_KEY' => $authKey,
+                'phone' => $mobileNumber,
+                'message' => $message,
+            ];
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $postData,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+            ]);
+
+            $output = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                \Log::error('SMS sending error: ' . curl_error($ch));
+            }
+
+            curl_close($ch);
 
 
             // Return the response with the customer data
