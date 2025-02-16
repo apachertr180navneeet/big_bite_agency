@@ -1,10 +1,15 @@
 @extends('admin.layouts.app') @section('style') @endsection @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <div class="row">
-        <div class="col-md-6 text-start">
+        <div class="col-md-3 text-start">
             <h5 class="py-2 mb-2">
                 <span class="text-primary fw-light">Customer</span>
             </h5>
+        </div>
+        <div class="col-md-3 text-center">
+            <a href="" class="btn btn-sucesse">
+                Import Customer
+            </a>
         </div>
         <div class="col-md-6 text-end">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
