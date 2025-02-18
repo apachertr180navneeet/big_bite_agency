@@ -286,23 +286,18 @@
                 {
                     data: "action",
                     render: (data, type, row) => {
-                        //if (row.status === "inactive") {
-                            @if ($user->role == 'admin')
-                                const statusButton = row.status === "inactive"
-                                ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
-                                : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Pending</button>`;
-                            @else
-                                const statusButton = row.manager_status === "inactive"
-                                ? `<button type="button" class="btn btn-sm btn-success" onclick="updateMangaerStatus(${row.id}, 'active')">Recived</button>`
-                                : `<button type="button" class="btn btn-sm btn-danger" onclick="updateMangaerStatus(${row.id}, 'inactive')">Pending</button>`;
-                            @endif
+                        @if ($user->role == 'admin')
+                            const statusButton = row.status === "inactive"
+                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
+                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Pending</button>`;
                             const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
-                            //const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
-
                             return `${statusButton} ${deleteButton}`;
-                        //}else{
-                            //return 'Invoice Closed';
-                        //}
+                        @else
+                            const statusButton = row.manager_status === "inactive"
+                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateMangaerStatus(${row.id}, 'active')">Recived</button>`
+                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateMangaerStatus(${row.id}, 'inactive')">Pending</button>`;
+                            return `${statusButton}`;
+                        @endif
                     },
                 },
 
@@ -360,7 +355,7 @@
         // Assign name filter
         $('#assignNameFilter').on('change', function () {
             const selectedName = $(this).val();
-            table.column(5).search(selectedName).draw(); // Assign To column index
+            table.column(6).search(selectedName).draw(); // Assign To column index
         });
 
         // Trigger filters

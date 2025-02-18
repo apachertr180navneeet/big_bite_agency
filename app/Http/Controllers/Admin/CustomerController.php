@@ -101,7 +101,7 @@ class CustomerController extends Controller
         $rules = [
             'name' => 'required|string',
             'firm' => 'required|unique:customers,firm',
-            'phone' => 'required|numeric|digits:10|unique:customers,phone',
+            'phone' => 'nullable|numeric|digits:10|unique:customers,phone',
             //'email' => 'nullable|email|unique:customers,email',
             'gst' => 'nullable|unique:customers,gst',
             'address1' => 'required',
