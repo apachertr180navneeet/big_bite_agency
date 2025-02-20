@@ -29,6 +29,7 @@
 			['route' => 'admin.customer.index', 'text' => 'Customer'],
 			['route' => 'admin.invoice.index', 'text' => 'Invoice'],
 			['route' => 'admin.receipt.index', 'text' => 'Receipt'],
+			['route' => 'admin.reports.sale.person', 'text' => 'Sale Person Report'],
 		] as $mastermenu)
 			<li class="menu-item {{ request()->routeIs($mastermenu['route']) ? 'active' : '' }}">
 				<a href="{{ route($mastermenu['route']) }}" class="menu-link">

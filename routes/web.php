@@ -11,7 +11,8 @@ use App\Http\Controllers\Admin\{
     AdminAuthController,
     PageController,
     ContactController,
-    NotificationController
+    NotificationController,
+    ReportController
 };
 
 /*
@@ -83,6 +84,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/index', 'index')->name('index');
             Route::get('/clear', 'clear')->name('clear');
             Route::delete('/delete/{id}', 'destroy')->name('destroy');
+        });
+
+        // Report
+        Route::prefix('reports')->name('reports.')->controller(ReportController::class)->group(function () {
+            Route::get('/sale-person', 'salePerson')->name('sale.person');
+            Route::get('/customer-invoice/{id}', 'customerWishinvoice')->name('customer.invoice');
+            Route::post('/generate-pdf', 'generatePDF')->name('generate.pdf');
+            Route::post('/sale-generate-pdf', 'salegeneratePDF')->name('sale.generate.pdf');
         });
 
         // Master Route
