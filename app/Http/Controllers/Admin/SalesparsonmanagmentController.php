@@ -42,8 +42,7 @@ class SalesparsonmanagmentController extends Controller
     {
         $user = Auth::user();
 
-        $saleparson = User::where('role', 'salesparson')
-        ->get();
+        $saleparson = User::where('role', 'salesparson')->get();
 
         return response()->json(['data' => $saleparson]);
     }

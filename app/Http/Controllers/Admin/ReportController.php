@@ -183,4 +183,98 @@ class ReportController extends Controller
         // Return the generated PDF to the browser for download
         return $pdf->download('salesperson.pdf');
     }
+
+    public function unclamReportview()
+    {
+        $user = Auth::user();
+
+        // Fetch active customers and salespersons
+        $customers = Customer::where('status', 'active')->get();
+        $salesparsons = User::where('status', 'active')->where('role', 'salesparson')->get();
+
+        // Query to get receipts with necessary joins and conditions
+        $saleparsonQuery = Receipt::join('invoices', 'receipts.bill_id', '=', 'invoices.id')
+            ->join('users', 'invoices.assign', '=', 'users.id')
+            ->join('customers', 'invoices.customer', '=', 'customers.id')
+            ->select(
+                'receipts.*',
+                'invoices.invoice as bill_number',
+                'invoices.customer as customers_id',
+                'invoices.assign as assign_id',
+                'customers.firm as customers_name',
+                'users.full_name as assign_name'
+            );
+
+        // Apply status condition based on user role
+        if ($user->role === 'admin') {
+            $saleparsonQuery->where('receipts.status', 'inactive');
+        } else {
+            $saleparsonQuery->where('receipts.manager_status', 'inactive');
+        }
+
+        $recipts = $saleparsonQuery->get();
+
+        $receiptArray = $recipts->map(function ($receipt) {
+            return [
+                'id'             => $receipt->id,
+                'date'           => $receipt->date,
+                'bill_number'    => $receipt->bill_number,
+                'customers_name' => $receipt->customers_name,
+                'assign_name'    => $receipt->assign_name,
+                'receipt'        => $receipt->receipt,
+                'UPI'            => $receipt->mode === 'Upi' ? $receipt->amount : 0,
+                'Cheque'         => $receipt->mode === 'Cheque' ? $receipt->amount : 0,
+                'Cash'           => $receipt->mode === 'Cash' ? $receipt->amount : 0,
+                'RTGS'           => $receipt->mode === 'RTGS' ? $receipt->amount : 0,
+                'status'         => $receipt->status,
+                'manager_status' => $receipt->manager_status,
+            ];
+        });
+
+        // Pass data to the view
+        return view('admin.report.un_claim_report', compact('customers', 'salesparsons', 'receiptArray'));
+    }
+
+
+    public function fetchReceipts(Request $request)
+    {
+        $query = Receipt::join('invoices', 'receipts.bill_id', '=', 'invoices.id')
+            ->join('users', 'invoices.assign', '=', 'users.id')
+            ->join('customers', 'invoices.customer', '=', 'customers.id')
+            ->select(
+                'receipts.*',
+                'invoices.invoice as bill_number',
+                'customers.firm as customers_name',
+                'users.full_name as assign_name'
+            );
+
+        if ($request->date) {
+            $query->whereDate('receipts.date', $request->date);
+        }
+
+        if ($request->sale_parson) {
+            $query->where('invoices.assign', $request->sale_parson);
+        }
+
+        if ($request->customer) {
+            $query->where('invoices.customer', $request->customer);
+        }
+
+        $receipts = $query->get()->map(function ($receipt) {
+            return [
+                'id'             => $receipt->id,
+                'date'           => $receipt->date,
+                'customers_name' => $receipt->customers_name,
+                'assign_name'    => $receipt->assign_name,
+                'RTGS'           => ($receipt->mode === 'RTGS') ? $receipt->amount : 0,
+                'Cash'           => ($receipt->mode === 'Cash') ? $receipt->amount : 0,
+                'UPI'            => ($receipt->mode === 'Upi') ? $receipt->amount : 0,
+                'Cheque'         => ($receipt->mode === 'Cheque') ? $receipt->amount : 0,
+                'status'         => $receipt->status,
+                'manager_status' => $receipt->manager_status,
+            ];
+        });
+
+        return response()->json(['data' => $receipts]);
+    }
 }

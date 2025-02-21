@@ -90,6 +90,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('reports')->name('reports.')->controller(ReportController::class)->group(function () {
             Route::get('/sale-person', 'salePerson')->name('sale.person');
             Route::get('/customer-invoice/{id}', 'customerWishinvoice')->name('customer.invoice');
+            Route::get('/un-claim-report', 'unclamReportview')->name('un.claim.report');
+            Route::get('/fetch-receipts', 'fetchReceipts')->name('fetch.receipts');
             Route::post('/generate-pdf', 'generatePDF')->name('generate.pdf');
             Route::post('/sale-generate-pdf', 'salegeneratePDF')->name('sale.generate.pdf');
         });
