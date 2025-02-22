@@ -88,7 +88,7 @@
                                 Add Firm
                             </button>
                         </label>
-                        <select id="customer" class="form-select">
+                        <select id="customer" class="form-select js-example-basic-single">
                             <option value="">Select Firm</option>
                             @foreach ($customers as $customer)
                                 <option value="{{ $customer->id }}">{{ $customer->firm }}</option>
@@ -98,7 +98,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="assign" class="form-label">Sales Parson Name</label>
-                        <select id="assign" class="form-select">
+                        <select id="assign" class="form-select js-example-basic-single">
                             <option value="">Select Sales Parson</option>
                             @foreach ($salesparsons as $salesparson)
                                 <option value="{{ $salesparson->id }}">{{ $salesparson->full_name }}</option>
@@ -144,7 +144,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="editcustomer" class="form-label">Customer Name</label>
-                        <select id="editcustomer" class="form-select">
+                        <select id="editcustomer" class="form-select js-example-basic-single">
                             <option value="">Select Customer</option>
                             @foreach ($customers as $customer)
                                 <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -154,7 +154,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="editassign" class="form-label">Sales Parson Name</label>
-                        <select id="editassign" class="form-select">
+                        <select id="editassign" class="form-select js-example-basic-single">
                             <option value="">Select Sales Parson</option>
                             @foreach ($salesparsons as $salesparson)
                                 <option value="{{ $salesparson->id }}">{{ $salesparson->full_name }}</option>
@@ -280,6 +280,29 @@
 </div>
 
 @endsection @section('script')
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 with Bootstrap 5 theme
+        $('.js-example-basic-single').select2({
+            //theme: 'bootstrap-5' // Apply Bootstrap 5 theme
+        });
+    
+        // Reinitialize Select2 when modal is shown
+        $('#addModal').on('shown.bs.modal', function () {
+            $('.js-example-basic-single').select2({
+                //theme: 'bootstrap-5',
+                dropdownParent: $('#addModal') // Ensures dropdown stays inside modal
+            });
+        });
+
+        $('#editModal').on('shown.bs.modal', function () {
+            $('.js-example-basic-single').select2({
+                //theme: 'bootstrap-5',
+                dropdownParent: $('#editModal') // Ensures dropdown stays inside modal
+            });
+        });
+    });
+</script>
 <script>
     $(document).ready(function () {
         // Initialize DataTable

@@ -192,7 +192,7 @@ class ReceiptController extends Controller
         Receipt::create($dataUser);
 
         // Prepare SMS details
-        $authKey = "SYSPOLYSALES";
+        $authKey = "BIGBITEAGENCY";
         $mobileNumber = $customerNumber; // Replace with actual number
         //$message = "Your receipt has been successfully recorded. Receipt No: " . $request->receipt . ", Amount: " . $request->amount;
         $message = "Dear $customerName, ($firmName), We have received payment today $formattedDate. Total amount of receipt is $request->amount and receipt no is $request->receipt. Thanks for your payment.";

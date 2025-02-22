@@ -23,6 +23,9 @@
         <script src="{{asset('assets/admin/vendor/js/helpers.js')}}"></script>
         <script src="{{asset('assets/admin/js/config.js')}}"></script>
         <link rel="stylesheet" href="{{asset('assets/admin/css/sweet-alert.css')}}" />
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
         @yield('style')
         <style>
             
@@ -43,7 +46,7 @@
                     @include('admin.layouts.elements.right_sidebar')
                 </div>
         
-                <script src="{{asset('assets/admin/vendor/libs/jquery/jquery.js')}}"></script>
+                {{--  <script src="{{asset('assets/admin/vendor/libs/jquery/jquery.js')}}"></script>  --}}
                 <script src="{{asset('assets/admin/vendor/libs/popper/popper.js')}}"></script>
                 <script src="{{asset('assets/admin/vendor/js/bootstrap.js')}}"></script>
                 <script src="{{asset('assets/admin/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>

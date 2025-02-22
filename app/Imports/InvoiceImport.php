@@ -16,6 +16,7 @@ class InvoiceImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
+        $customerName = isset($row['customer']) ? str_replace(['[', ']'], ['(', ')'], $row['customer']) : null;
         // Fetch customer ID from the customers table
         $customer = Customer::where('firm', $row['customer'])->first();
         $customerId = $customer ? $customer->id : null;

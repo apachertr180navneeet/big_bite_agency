@@ -11,12 +11,23 @@
 
     $user = auth()->user();
 @endphp
+<style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+
 <div class="container-fluid flex-grow-1 container-p-y">
     <div class="row">
         <div class="col-md-6 text-start">
             <h5 class="py-2 mb-2">
                 <span class="text-primary fw-light">Un Claim Report</span>
             </h5>
+        </div>
+        <div class="col-md-6 text-end">
+            <button id="printTableBtn" class="btn btn-primary">Print Table</button>
         </div>
     </div>
     <div class="row">
@@ -58,7 +69,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="table-responsive text-nowrap">
+                        <div class="table-responsive text-nowrap" id="pdfImport">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -68,7 +79,7 @@
                                         <th>Cash</th>
                                         <th>UPI</th>
                                         <th>Cheque</th>
-                                        <th>Action</th>
+                                        <th class="no-print">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="receiptTableBody">
@@ -80,7 +91,7 @@
                                             <td>{{ $receipt['Cash'] }}</td>
                                             <td>{{ $receipt['UPI'] }}</td>
                                             <td>{{ $receipt['Cheque'] }}</td>
-                                            <td>
+                                            <td class="no-print">
                                                 @if ($user->role == 'admin')
                                                     @if ($receipt['status'] == 'inactive')
                                                         <button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus({{ $receipt['id'] }}, 'active')">Recived</button>
@@ -174,7 +185,7 @@
                                     <td>${receipt.Cash}</td>
                                     <td>${receipt.UPI}</td>
                                     <td>${receipt.Cheque}</td>
-                                    <td>${actionButtons}</td>
+                                    <td class="no-print">${actionButtons}</td>
                                 </tr>
                             `);
                         });
@@ -319,6 +330,41 @@
         window.updateUserStatus = updateUserStatus;
         window.updateMangaerStatus = updateMangaerStatus;
         window.deleteUser = deleteUser;
+    });
+    
+    $(document).ready(function () {
+        $('#printTableBtn').click(function () {
+            var printContent = document.getElementById('pdfImport').innerHTML;
+            var originalContent = document.body.innerHTML;
+    
+            document.body.innerHTML = `
+                <html>
+                    <head>
+                        <title>Print Table</title>
+                        <style>
+                            @media print {
+                                body { font-family: Arial, sans-serif; }
+                                table { width: 100%; border-collapse: collapse; }
+                                th, td { border: 1px solid black; padding: 8px; text-align: center; }
+                                th { background-color: #f2f2f2; }
+                                @page { size: A4; margin: 20mm; }
+                                .no-print { 
+                                    display: none !important; 
+                                }
+
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h2 class="text-center">Unclaim Report</h2>
+                        ${printContent}
+                    </body>
+                </html>`;
+    
+            window.print();
+            document.body.innerHTML = originalContent;
+            location.reload(); // Reload the page to restore functionality
+        });
     });        
 </script>
 @endsection

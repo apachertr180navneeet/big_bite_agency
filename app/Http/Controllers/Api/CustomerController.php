@@ -389,7 +389,7 @@ class CustomerController extends Controller
             $pdfUrl = asset('uploads/' . basename($filePath));
 
             // Prepare SMS details
-            $authKey = "SYSPOLYSALES";
+            $authKey = "BIGBITEAGENCY";
             $mobileNumber = $customer->phone; // Replace with actual number
             //$message = "Your receipt has been successfully recorded. Receipt No: " . $newReceipt . ", Amount: " . $request->amount;
             $message = "Dear $customer->firm, We have received payment today $formattedDate. Total amount of receipt is $request->amount and receipt no is $newReceipt. Thanks for your payment.";

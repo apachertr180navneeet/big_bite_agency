@@ -43,14 +43,15 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Receipt No.</th>
-                                    <th>Bill No.</th>
-                                    <th>Amount</th>
-                                    <th>Payment Type</th>
-                                    <th>Discount</th>
-                                    <th>Sales Parson</th>
+                                    <th>R. No.</th>
+                                    <th>B. No.</th>
+                                    <th>Amt</th>
+                                    <th>Remark</th>
+                                    <th>Mode</th>
+                                    <th>Disc</th>
+                                    <th>S.P.</th>
                                     <th>Firm</th>
-                                    <th>Manager Status</th>
+                                    <th>M. Status</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -252,6 +253,9 @@
                 },
                 {
                     data: "amount",
+                },
+                {
+                    data: "remark",
                 },
                 {
                     data: "mode",
