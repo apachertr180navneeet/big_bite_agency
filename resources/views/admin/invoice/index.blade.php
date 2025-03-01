@@ -1,4 +1,7 @@
 @extends('admin.layouts.app') @section('style') @endsection @section('content')
+@php
+    $user = auth()->user();
+@endphp
 <div class="container-fluid flex-grow-1 container-p-y">
     <div class="row">
         <div class="col-md-6 text-start">
@@ -305,6 +308,8 @@
 </script>
 <script>
     $(document).ready(function () {
+        const userRole = @json(auth()->check() ? auth()->user()->role : null);
+        console.log(userRole);        
         // Initialize DataTable
         const table = $("#branchTable").DataTable({
             processing: true,
@@ -353,15 +358,35 @@
                 {
                     data: "action",
                     render: (data, type, row) => {
-                        const statusButton = row.status === "inactive"
-                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Activate</button>`
-                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Deactivate</button>`;
+                        let statusButton = "";
+                        let editButton = "";
 
-                        //const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
-                        const editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
+                        // Ensure userRole is not null
+                        if (userRole && (userRole === "admin")) {
+                            statusButton = row.status === "inactive"
+                                ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Activate</button>`
+                                : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Deactivate</button>`;
+                            if(row.payment === "done"){
+                                editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
+
+                            }else{
+                                editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
+                            }
+                        } else if (userRole && (userRole === "manger")) {
+                            statusButton = row.status === "inactive"
+                                ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Activate</button>`
+                                : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Deactivate</button>`;
+
+                                if(row.payment === "pending"){
+                                    editButton = `<button type="button" class="btn btn-sm btn-warning" onclick="editUser(${row.id})">Edit</button>`;
+    
+                                }else{
+                                    editButton = "";
+                                }
+                        }
 
                         return `${statusButton} ${editButton}`;
-                    },
+                    }
                 },
 
             ],
