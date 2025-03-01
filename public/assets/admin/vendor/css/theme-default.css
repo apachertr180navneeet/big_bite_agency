@@ -649,20 +649,20 @@ a:hover {
 }
 
 .bg-menu-theme {
-  background-color: #272757 !important;
-  color: #fff !important;
+  background-color: #fff !important;
+  color: #00000 !important;
 }
 .bg-menu-theme .menu-link,
 .bg-menu-theme .menu-horizontal-prev,
 .bg-menu-theme .menu-horizontal-next {
-  color: #fff;
+  color: #000
 }
 .bg-menu-theme .menu-link:hover, .bg-menu-theme .menu-link:focus,
 .bg-menu-theme .menu-horizontal-prev:hover,
 .bg-menu-theme .menu-horizontal-prev:focus,
 .bg-menu-theme .menu-horizontal-next:hover,
 .bg-menu-theme .menu-horizontal-next:focus {
-  color: #fff;
+  color: #000;
 }
 .bg-menu-theme .menu-link.active,
 .bg-menu-theme .menu-horizontal-prev.active,

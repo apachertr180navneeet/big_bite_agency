@@ -13,21 +13,19 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->unsignedBigInteger('company_id')->nullable();
+
             $table->string('full_name');
-            $table->string('slug');
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
-            $table->enum('role',['admin','user','manger'])->default('user');
+            $table->enum('role',['admin','user','vendor','customer'])->default('user');
             $table->string('address')->default('');
             $table->string('area')->default('');
             $table->string('city')->default('');
             $table->string('state')->default('');
-            $table->string('country');
             $table->integer('country_code')->default(61);
             $table->string('zipcode')->default('');
             $table->string('latitude')->default('');

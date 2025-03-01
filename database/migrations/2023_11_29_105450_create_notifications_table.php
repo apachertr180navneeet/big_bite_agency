@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('notification_type');
             $table->string('action_type');
             $table->string('title');
-            $table->text('description')->default('');
+            $table->text('description')->default(Null);
             $table->string('url');
             $table->text('data')->nullable();
             $table->text('image')->nullable();

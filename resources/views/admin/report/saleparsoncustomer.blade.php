@@ -28,7 +28,7 @@
         
                             <div class="mb-3">
                                 <strong>Total Outstanding: </strong>
-                                <span>{{ $salespersonOutstandings->sum(function($outstanding) { return $outstanding->outstanding; }) }}</span>
+                                <span>{{ $salespersonOutstandings->sum(function($total_pending_amount) { return $total_pending_amount->total_pending_amount; }) }}</span>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -48,9 +48,9 @@
                             <tbody>
                                 @foreach ($salespersonOutstandings as $salespersonOutstanding) 
                                     <tr>
-                                        <td>{{ $salespersonOutstanding->firm }}</td>
-                                        <td>{{ $salespersonOutstanding->outstanding }}</td>
-                                        <td>{{ $salespersonOutstanding->invoice }}</td>
+                                        <td>{{ $salespersonOutstanding->customer_name }}</td>
+                                        <td>{{ $salespersonOutstanding->total_pending_amount }}</td>
+                                        <td>{{ $salespersonOutstanding->total_pending_invoices }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -68,6 +68,11 @@
 
 @section('script')
 <script>
+    const table = $("#branchTable").DataTable({
+        processing: true,
+        paging: false, // Disable pagination
+        searching: false, // Optional: Disable search if not needed
+    });
     document.getElementById('buttonpdf').addEventListener('click', function () {
         // Send an AJAX request to generate and download the PDF
         $.ajax({

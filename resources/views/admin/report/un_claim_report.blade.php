@@ -27,7 +27,7 @@
             </h5>
         </div>
         <div class="col-md-6 text-end">
-            <button id="printTableBtn" class="btn btn-primary">Print Table</button>
+            <button id="printTableBtn" class="btn btn-primary">Print</button>
         </div>
     </div>
     <div class="row">
@@ -337,6 +337,10 @@
             var printContent = document.getElementById('pdfImport').innerHTML;
             var originalContent = document.body.innerHTML;
     
+            // Retrieve selected salesperson and date
+            var salesperson = $('#sale_parson option:selected').text();// Adjust ID as per your field
+            var selectedDate = $('#date').val(); // Adjust ID as per your field
+    
             document.body.innerHTML = `
                 <html>
                     <head>
@@ -348,15 +352,14 @@
                                 th, td { border: 1px solid black; padding: 8px; text-align: center; }
                                 th { background-color: #f2f2f2; }
                                 @page { size: A4; margin: 20mm; }
-                                .no-print { 
-                                    display: none !important; 
-                                }
-
+                                .no-print { display: none !important; }
                             }
                         </style>
                     </head>
                     <body>
                         <h2 class="text-center">Unclaim Report</h2>
+                        <p><strong>Salesperson:</strong> ${salesperson || 'N/A'}</p>
+                        <p><strong>Date:</strong> ${selectedDate || 'N/A'}</p>
                         ${printContent}
                     </body>
                 </html>`;
@@ -365,6 +368,7 @@
             document.body.innerHTML = originalContent;
             location.reload(); // Reload the page to restore functionality
         });
-    });        
+    });
+          
 </script>
 @endsection

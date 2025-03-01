@@ -76,19 +76,18 @@ class ReportController extends Controller
         $salespersonOutstandings = Invoice::where('invoices.assign', $id)
         ->where('invoices.payment', 'pending')
         ->join('customers', 'invoices.customer', '=', 'customers.id')
-        ->leftJoin('receipts', 'invoices.id', '=', 'receipts.bill_id') // Join receipts table
+        ->leftJoin(DB::raw('(SELECT bill_id, SUM(amount) as receipt_amount FROM receipts GROUP BY bill_id) as receipts_total'), 'invoices.id', '=', 'receipts_total.bill_id') // Subquery to sum receipts per invoice
         ->select(
-            'invoices.amount',
-            'invoices.id',
-            'invoices.invoice',
-            'customers.firm',
-            DB::raw('COALESCE(invoices.amount, 0) - COALESCE(SUM(receipts.amount), 0) as outstanding') // Subtract receipt amounts
+            'customers.id as customer_id',
+            'customers.firm as customer_name',
+            DB::raw('COUNT(DISTINCT invoices.id) as total_pending_invoices'), // Total pending invoices per customer
+            DB::raw('SUM(COALESCE(invoices.amount, 0) - COALESCE(receipts_total.receipt_amount, 0)) as total_pending_amount') // Total outstanding amount per customer
         )
-        ->groupBy('invoices.id', 'invoices.amount', 'invoices.invoice', 'customers.firm') // Group by invoice details
-        ->havingRaw('COALESCE(invoices.amount, 0) - COALESCE(SUM(receipts.amount), 0) > 0') // Exclude records where outstanding is 0
-        ->get(); 
-        
-        
+        ->groupBy('customers.id', 'customers.firm') // Group by customer
+        ->havingRaw('SUM(COALESCE(invoices.amount, 0) - COALESCE(receipts_total.receipt_amount, 0)) > 0') // Exclude zero outstanding
+        ->orderByRaw('COUNT(DISTINCT invoices.id) DESC') // Order by total_pending_invoices descending
+        ->get();
+
 
         // Pass the data to the view
         return view('admin.report.saleparsoncustomer', compact('salespersonOutstandings','user'));
