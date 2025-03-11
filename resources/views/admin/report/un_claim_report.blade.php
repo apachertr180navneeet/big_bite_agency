@@ -35,11 +35,15 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4">
-                            <label for="date" class="col-md-2 col-form-label">Date</label>
-                            <input class="form-control" type="date" value="" id="date">
+                        <div class="col-md-3">
+                            <label for="start_date" class="col-md-2 col-form-label">Start Date</label>
+                            <input class="form-control" type="date" value="" id="start_date">
                         </div>
-                        <div class="col-md-4" style="margin-top: 4px;">
+                        <div class="col-md-3">
+                            <label for="end_date" class="col-md-2 col-form-label">End Date</label>
+                            <input class="form-control" type="date" value="" id="end_date">
+                        </div>
+                        <div class="col-md-3" style="margin-top: 4px;">
                             <label for="sale_parson" class="form-label">Sale Parson</label>
                             <select id="sale_parson" class="form-select">
                               <option value="">Select</option>
@@ -48,7 +52,7 @@
                               @endforeach
                             </select>
                         </div>
-                        <div class="col-md-4" style="margin-top: 4px;">
+                        <div class="col-md-3" style="margin-top: 4px;">
                             <label for="customer" class="form-label">Customer</label>
                             <select id="customer" class="form-select">
                               <option value="">Select</option>
@@ -136,7 +140,8 @@
 <script>
     $(document).ready(function () {
         $('#searchBtn').click(function () {
-            var date = $('#date').val();
+            var start_date = $('#start_date').val();
+            var end_date = $('#end_date').val();
             var sale_parson = $('#sale_parson').val();
             var customer = $('#customer').val();
         
@@ -144,7 +149,8 @@
                 url: "{{ route('admin.reports.fetch.receipts') }}", // Laravel route
                 type: "GET",
                 data: {
-                    date: date,
+                    start_date: start_date,
+                    end_date: end_date,
                     sale_parson: sale_parson,
                     customer: customer
                 },

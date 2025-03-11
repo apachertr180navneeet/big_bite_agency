@@ -246,10 +246,16 @@ class ReportController extends Controller
                 'invoices.invoice as bill_number',
                 'customers.firm as customers_name',
                 'users.full_name as assign_name'
-            );
+            )
+            ->orderBy('receipts.date', 'desc'); // Order by date descending
 
-        if ($request->date) {
-            $query->whereDate('receipts.date', $request->date);
+        // Apply Start and End Date Filters
+        if ($request->start_date && $request->end_date) {
+            $query->whereBetween('receipts.date', [$request->start_date, $request->end_date]);
+        } elseif ($request->start_date) {
+            $query->whereDate('receipts.date', '>=', $request->start_date);
+        } elseif ($request->end_date) {
+            $query->whereDate('receipts.date', '<=', $request->end_date);
         }
 
         if ($request->sale_parson) {
@@ -276,5 +282,5 @@ class ReportController extends Controller
         });
 
         return response()->json(['data' => $receipts]);
-    }
+    }    
 }
