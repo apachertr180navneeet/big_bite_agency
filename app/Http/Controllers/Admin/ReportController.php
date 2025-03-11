@@ -211,7 +211,8 @@ class ReportController extends Controller
             $saleparsonQuery->where('receipts.manager_status', 'inactive');
         }
 
-        $recipts = $saleparsonQuery->get();
+        // Order by date in descending order
+        $recipts = $saleparsonQuery->orderBy('receipts.date', 'desc')->get();
 
         $receiptArray = $recipts->map(function ($receipt) {
             return [

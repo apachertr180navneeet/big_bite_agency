@@ -27,7 +27,7 @@
             </h5>
         </div>
         <div class="col-md-6 text-end">
-            <button id="printTableBtn" class="btn btn-primary">Print</button>
+            <button id="exportExcelBtn" class="btn btn-primary">Download Excel</button>
         </div>
     </div>
     <div class="row">
@@ -132,6 +132,7 @@
 @endsection
 
 @section('script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#searchBtn').click(function () {
@@ -338,7 +339,7 @@
             var originalContent = document.body.innerHTML;
     
             // Retrieve selected salesperson and date
-            var salesperson = $('#sale_parson option:selected').text();// Adjust ID as per your field
+            var salesperson = $('#sale_parson option:selected').text(); // Adjust ID as per your field
             var selectedDate = $('#date').val(); // Adjust ID as per your field
     
             document.body.innerHTML = `
@@ -368,7 +369,25 @@
             document.body.innerHTML = originalContent;
             location.reload(); // Reload the page to restore functionality
         });
+    
+        // Export to Excel
+        $('#exportExcelBtn').click(function () {
+            var table = document.getElementById('pdfImport'); // Adjust ID as per your table
+            
+            // Clone the table to avoid modifying the original one
+            var clonedTable = table.cloneNode(true);
+    
+            // Remove the last column (assumed to be the "Action" column)
+            $(clonedTable).find('tr').each(function () {
+                $(this).find('th:last, td:last').remove(); // Removes last column from each row
+            });
+    
+            // Convert to Excel
+            var workbook = XLSX.utils.table_to_book(clonedTable, { sheet: "Sheet1" });
+            XLSX.writeFile(workbook, 'Unclaim_Report.xlsx');
+        });
     });
+    
           
 </script>
 @endsection
