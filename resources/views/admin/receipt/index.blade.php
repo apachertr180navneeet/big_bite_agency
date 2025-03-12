@@ -359,7 +359,7 @@
         // Assign name filter
         $('#assignNameFilter').on('change', function () {
             const selectedName = $(this).val();
-            table.column(6).search(selectedName).draw(); // Assign To column index
+            table.column(7).search(selectedName).draw(); // Assign To column index
         });
 
         // Trigger filters

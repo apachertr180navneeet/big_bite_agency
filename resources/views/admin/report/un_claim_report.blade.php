@@ -379,19 +379,54 @@
         // Export to Excel
         $('#exportExcelBtn').click(function () {
             var table = document.getElementById('pdfImport'); // Adjust ID as per your table
-            
+        
             // Clone the table to avoid modifying the original one
             var clonedTable = table.cloneNode(true);
-    
+        
             // Remove the last column (assumed to be the "Action" column)
             $(clonedTable).find('tr').each(function () {
                 $(this).find('th:last, td:last').remove(); // Removes last column from each row
             });
-    
-            // Convert to Excel
-            var workbook = XLSX.utils.table_to_book(clonedTable, { sheet: "Sheet1" });
+        
+            // Convert table data to an array for better control
+            var data = [];
+            $(clonedTable).find('tr').each(function () {
+                var rowData = [];
+                $(this).find('td, th').each(function (index) {
+                    var cellText = $(this).text().trim();
+        
+                    // Convert first column (index 0) to dd/mm/yyyy if in yyyy-mm-dd format
+                    if (index === 0 && /^\d{4}-\d{2}-\d{2}$/.test(cellText)) {
+                        let [year, month, day] = cellText.split('-');
+                        cellText = `${day}/${month}/${year}`; // Convert to DD/MM/YYYY
+                    }
+        
+                    rowData.push(cellText);
+                });
+                data.push(rowData);
+            });
+        
+            // Convert data array to a worksheet
+            var worksheet = XLSX.utils.aoa_to_sheet(data);
+        
+            // Apply date format to the first column
+            var range = XLSX.utils.decode_range(worksheet['!ref']);
+            for (let row = range.s.r + 1; row <= range.e.r; row++) { // Skip header row
+                let cellAddress = `A${row + 1}`;
+                if (worksheet[cellAddress] && worksheet[cellAddress].v) {
+                    worksheet[cellAddress].z = 'dd/mm/yyyy'; // Set Excel date format
+                }
+            }
+        
+            // Create a workbook and append the sheet
+            var workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        
+            // Write to an Excel file
             XLSX.writeFile(workbook, 'Unclaim_Report.xlsx');
         });
+        
+                
     });
     
           
