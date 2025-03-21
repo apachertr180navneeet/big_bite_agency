@@ -45,15 +45,15 @@
                                     <th>Date</th>
                                     <th>R. No.</th>
                                     <th>B. No.</th>
+                                    <th>S.P.</th>     
                                     <th>Amt</th>
-                                    <th>Remark</th>
+                                    <th>Action</th>
                                     <th>Mode</th>
-                                    <th>Disc</th>
-                                    <th>S.P.</th>
                                     <th>Firm</th>
+                                    <th>Remark</th>
                                     <th>M. Status</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Disc</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -252,22 +252,36 @@
                     data: "bill_number",
                 },
                 {
+                    data: "assign_name",
+                },
+                {
                     data: "amount",
                 },
                 {
-                    data: "remark",
+                    data: "action",
+                    render: (data, type, row) => {
+                        @if ($user->role == 'admin')
+                            const statusButton = row.status === "inactive"
+                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
+                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Pending</button>`;
+                            const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
+                            return `${statusButton} ${deleteButton}`;
+                        @else
+                            const statusButton = row.manager_status === "inactive"
+                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateMangaerStatus(${row.id}, 'active')">Recived</button>`
+                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateMangaerStatus(${row.id}, 'inactive')">Pending</button>`;
+                            return `${statusButton}`;
+                        @endif
+                    },
                 },
                 {
                     data: "mode",
                 },
                 {
-                    data: "discount",
-                },
-                {
-                    data: "assign_name",
-                },
-                {
                     data: "customers_name",
+                },
+                {
+                    data: "remark",
                 },
                 {
                     data: "manager_status",
@@ -288,21 +302,7 @@
                     },
                 },
                 {
-                    data: "action",
-                    render: (data, type, row) => {
-                        @if ($user->role == 'admin')
-                            const statusButton = row.status === "inactive"
-                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateUserStatus(${row.id}, 'active')">Recived</button>`
-                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateUserStatus(${row.id}, 'inactive')">Pending</button>`;
-                            const deleteButton = `<button type="button" class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})">Delete</button>`;
-                            return `${statusButton} ${deleteButton}`;
-                        @else
-                            const statusButton = row.manager_status === "inactive"
-                            ? `<button type="button" class="btn btn-sm btn-success" onclick="updateMangaerStatus(${row.id}, 'active')">Recived</button>`
-                            : `<button type="button" class="btn btn-sm btn-danger" onclick="updateMangaerStatus(${row.id}, 'inactive')">Pending</button>`;
-                            return `${statusButton}`;
-                        @endif
-                    },
+                    data: "discount",
                 },
 
             ],
@@ -359,7 +359,7 @@
         // Assign name filter
         $('#assignNameFilter').on('change', function () {
             const selectedName = $(this).val();
-            table.column(7).search(selectedName).draw(); // Assign To column index
+            table.column(3).search(selectedName).draw(); // Assign To column index
         });
 
         // Trigger filters

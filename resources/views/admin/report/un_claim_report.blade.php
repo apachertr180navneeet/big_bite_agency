@@ -79,6 +79,7 @@
                                     <tr>
                                         <th>Date</th>
                                         <th>Name</th>
+                                        <th>Bill Number</th>
                                         <th>RTGS</th>
                                         <th>Cash</th>
                                         <th>UPI</th>
@@ -91,6 +92,7 @@
                                         <tr>
                                             <td>{{ Carbon::parse($receipt['date'])->format('d/m/Y') }}</td>
                                             <td>{{ $receipt['customers_name'] }}</td>
+                                            <td>{{ $receipt['bill_number'] }}</td>
                                             <td>{{ $receipt['RTGS'] }}</td>
                                             <td>{{ $receipt['Cash'] }}</td>
                                             <td>{{ $receipt['UPI'] }}</td>
@@ -188,6 +190,7 @@
                                 <tr>
                                     <td>${formattedDate}</td>
                                     <td>${receipt.customers_name}</td>
+                                    <td>${receipt.bill_number}</td>
                                     <td>${receipt.RTGS}</td>
                                     <td>${receipt.Cash}</td>
                                     <td>${receipt.UPI}</td>

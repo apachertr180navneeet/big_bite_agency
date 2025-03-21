@@ -16,7 +16,7 @@ class InvoiceImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
-        $customerName = isset($row['customer']) ? str_replace(['[', ']'], ['(', ')'], $row['customer']) : null;
+        //$customerName = isset($row['customer']) ? str_replace(['[', ']'], ['(', ')'], $row['customer']) : null;
         // Fetch customer ID from the customers table
         $customer = Customer::where('firm', $row['customer'])->first();
         $customerId = $customer ? $customer->id : null;
@@ -34,10 +34,10 @@ class InvoiceImport implements ToModel, WithHeadingRow
                 $formattedDate = null;
             }
         }
-        return Invoice::firstOrCreate(
-            ['invoice' => $row['invoice']],
+        return Invoice::create(
             [
                 'customer' => $customerId, // Store customer ID
+                'invoice'  => $row['invoice'], //
                 'assign' => $assignId, // Store user ID
                 'amount' => $row['amount'] ?? null,
                 'date' => $formattedDate,

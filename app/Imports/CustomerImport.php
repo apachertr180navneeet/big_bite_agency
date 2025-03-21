@@ -23,7 +23,7 @@
 
             // Create a new customer if firm name is unique
             return Customer::create([
-                'firm'    => $firmName,
+                'firm'    => $row['fim_name']?? null,
                 'name'    => $row['name'] ?? null,
                 'phone'   => $row['phone'] ?? null,
                 'gst_no'  => $row['gst_no'] ?? null,
