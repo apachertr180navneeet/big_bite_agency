@@ -161,7 +161,7 @@
                     tableBody.empty(); // Clear existing data
         
                     var totalRTGS = 0, totalCash = 0, totalUPI = 0, totalCheque = 0;
-        
+                    
                     if (response.data.length > 0) {
                         $.each(response.data, function (index, receipt) {
                             var formattedDate = new Date(receipt.date).toLocaleDateString('en-GB'); // Convert to dd/mm/yyyy format
@@ -200,11 +200,15 @@
                             `);
                         });
         
+                        // Calculate final total after the loop
+                        var finaltotal = totalRTGS + totalCash + totalUPI + totalCheque;
+        
                         // Append the Total Row at the end
                         tableBody.append(`
                             <tr>
-                                <td></td> <!-- Empty column under 'Name' -->
+                                <td></td> <!-- Empty column under 'Date' -->
                                 <td class="text-end" colspan="1"><strong>Total</strong></td>
+                                <td><strong>${finaltotal.toFixed(2)}</strong></td> <!-- Empty column under 'Bill Number' -->
                                 <td><strong>${totalRTGS.toFixed(2)}</strong></td>
                                 <td><strong>${totalCash.toFixed(2)}</strong></td>
                                 <td><strong>${totalUPI.toFixed(2)}</strong></td>
@@ -213,11 +217,12 @@
                             </tr>
                         `);
                     } else {
-                        tableBody.append('<tr><td colspan="7" class="text-center">No records found</td></tr>');
+                        tableBody.append('<tr><td colspan="8" class="text-center">No records found</td></tr>');
                     }
                 }
             });
         });
+        
         
 
         // Update user status

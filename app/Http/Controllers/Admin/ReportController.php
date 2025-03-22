@@ -52,8 +52,13 @@ class ReportController extends Controller
                 ->where('invoices.assign', $salevalue->id)
                 ->sum('receipts.amount');
 
+            $receiveddiscount = DB::table('receipts')
+                ->join('invoices', 'receipts.bill_id', '=', 'invoices.id')
+                ->where('invoices.assign', $salevalue->id)
+                ->sum('receipts.discount');
+
             // Calculate outstanding amount
-            $outstandingAmount = $invoicePayments - $receivedAmount;
+            $outstandingAmount = $invoicePayments - ($receivedAmount + $receiveddiscount);
 
             $salespersonOutstandings[$salekey] = [
                 'id' => $salevalue->id,
@@ -278,6 +283,7 @@ class ReportController extends Controller
                 'Cheque'         => ($receipt->mode === 'Cheque') ? $receipt->amount : 0,
                 'status'         => $receipt->status,
                 'manager_status' => $receipt->manager_status,
+                'bill_number'    => $receipt->bill_number,
             ];
         });
 

@@ -29,6 +29,7 @@
 			['route' => 'admin.customer.index', 'text' => 'Customer'],
 			['route' => 'admin.invoice.index', 'text' => 'Invoice'],
 			['route' => 'admin.receipt.index', 'text' => 'Receipt'],
+			['route' => 'admin.receipt.recevied', 'text' => 'Recived Receipt'],
 			['route' => 'admin.reports.sale.person', 'text' => 'Sale Person Report'],
 			['route' => 'admin.reports.un.claim.report', 'text' => 'UN Claim Report'],
 		] as $mastermenu)

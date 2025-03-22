@@ -217,7 +217,8 @@ class CustomerController extends Controller
             // Add invoice data
             $ledgerData[] = [
                 'date' => Carbon::parse($invoiceValue->date)->format('d/m/Y'),
-                'description' => "Sales Invoice " .$invoiceValue->invoice,
+                'timestamp' => strtotime($invoiceValue->date), // Store timestamp for sorting
+                'description' => "Sales Invoice " . $invoiceValue->invoice,
                 'bill' => $invoiceValue->amount,
                 'receipt' => '0',
                 'discount' => '0',
@@ -225,14 +226,14 @@ class CustomerController extends Controller
 
             // Update the total invoice amount
             $totalInvoice += $invoiceValue->amount;
-            
 
             // Fetch related receipts
             $receiptLists = Receipt::where('bill_id', $invoiceValue->id)->get();
             foreach ($receiptLists as $receiptValue) {
                 $ledgerData[] = [
                     'date' => Carbon::parse($receiptValue->date)->format('d/m/Y'),
-                    'description' => "Recepit Voucher " . $receiptValue->receipt,
+                    'timestamp' => strtotime($receiptValue->date), // Store timestamp for sorting
+                    'description' => "Receipt Voucher " . $receiptValue->receipt,
                     'bill' => '0',
                     'receipt' => $receiptValue->amount,
                     'discount' => $receiptValue->discount,
@@ -243,19 +244,24 @@ class CustomerController extends Controller
             }
         }
 
-        // Sort the ledger data by date
+        // Sort the ledger data by date in **descending** order (newest first)
         usort($ledgerData, function ($a, $b) {
-            return strtotime($a['date']) - strtotime($b['date']);
+            return $b['timestamp'] <=> $a['timestamp']; // Sort by timestamp descending
         });
+
+        // Remove timestamp before passing data to the view
+        foreach ($ledgerData as &$entry) {
+            unset($entry['timestamp']);
+        }
+        unset($entry); // Break reference
 
         // Calculate the total due
         $totalDue = $totalInvoice - $totalReceipt;
 
-        
-
         // Pass the ledger data and totals to the view
-        return view('admin.customer.leger', compact('ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue','customerDetail'));
+        return view('admin.customer.leger', compact('ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue', 'customerDetail'));
     }
+
 
     public function import(Request $request)
     {

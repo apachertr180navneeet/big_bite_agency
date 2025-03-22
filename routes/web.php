@@ -112,6 +112,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     Route::post('detail', [$controller, 'detail'])->name('detail');
                     Route::post('managerStatus', [$controller, 'managerStatus'])->name('manager.status');
                     Route::get('/get-pending-invoices/{customerId}', [$controller, 'getPendingInvoices']);
+                    Route::get('/recevied/recept', [$controller, 'recevied'])->name('recevied');
+                    Route::get('all/receved/recept', [$controller, 'getallreceved'])->name('getallreceved');
                 }
                 if($resource == 'customer'){
                     Route::get('lager/{id}', [$controller, 'lager'])->name('lager');

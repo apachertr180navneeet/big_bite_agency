@@ -234,7 +234,7 @@
         const table = $("#branchTable").DataTable({
             processing: true,
             ajax: {
-                url: "{{ route('admin.receipt.getall') }}",
+                url: "{{ route('admin.receipt.getallreceved') }}",
             },
             columns: [
                 {
@@ -359,7 +359,7 @@
         // Assign name filter
         $('#assignNameFilter').on('change', function () {
             const selectedName = $(this).val();
-            table.column(3recived).search(selectedName).draw(); // Assign To column index
+            table.column(3).search(selectedName).draw(); // Assign To column index
         });
 
         // Trigger filters

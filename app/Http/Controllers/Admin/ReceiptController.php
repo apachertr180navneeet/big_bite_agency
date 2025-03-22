@@ -55,6 +55,51 @@ class ReceiptController extends Controller
         $user = Auth::user();
 
         $saleparson = Receipt::join('invoices', 'receipts.bill_id', '=', 'invoices.id')
+        ->where('receipts.status','inactive')
+        ->join('users', 'invoices.assign', '=', 'users.id')
+        ->join('customers', 'invoices.customer', '=', 'customers.id')
+        ->select('receipts.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id', 'invoices.assign as assign_id', 'customers.firm as customers_name' , 'users.full_name as assign_name')
+        ->get();
+
+        return response()->json(['data' => $saleparson]);
+    }
+
+
+
+    public function recevied(Request $request)
+    {
+
+        $customers = Customer::where('status','active')->get();
+
+        $salesparsons = User::where('status','active')->where('role','salesparson')->get();
+
+        $invoices = Invoice::get();
+
+        $lastReceipt = Receipt::latest('id')->first();
+
+        if($lastReceipt){
+            $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
+        }else{
+            $newReceipt = sprintf('%04d', intval(1));
+        }
+
+
+        // Pass the data to the view
+        return view('admin.receipt.recived', compact('customers','salesparsons','invoices','newReceipt'));
+    }
+
+    /**
+     * Fetch all companies and return as JSON.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getallreceved(Request $request)
+    {
+        $user = Auth::user();
+
+        $saleparson = Receipt::join('invoices', 'receipts.bill_id', '=', 'invoices.id')
+        ->where('receipts.status','active')
         ->join('users', 'invoices.assign', '=', 'users.id')
         ->join('customers', 'invoices.customer', '=', 'customers.id')
         ->select('receipts.*', 'invoices.invoice as bill_number', 'invoices.customer as customers_id', 'invoices.assign as assign_id', 'customers.firm as customers_name' , 'users.full_name as assign_name')
