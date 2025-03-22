@@ -43,7 +43,6 @@ class ReportController extends Controller
         foreach ($salespersons as $salekey => $salevalue) {
             // Total pending invoice amount
             $invoicePayments = Invoice::where('assign', $salevalue->id)
-                ->where('payment', 'pending')
                 ->sum('amount');
 
             // Total received amount from receipts for the salesperson's invoices
@@ -161,7 +160,7 @@ class ReportController extends Controller
         foreach ($salespersons as $salekey => $salevalue) {
             // Total pending invoice amount
             $invoicePayments = Invoice::where('assign', $salevalue->id)
-                ->where('payment', 'pending')
+                //->where('payment', 'pending')
                 ->sum('amount');
 
             // Total received amount from receipts for the salesperson's invoices
