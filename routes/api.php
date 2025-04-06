@@ -56,3 +56,5 @@ Route::middleware('jwt.verify')->group(function() {
 });
 
 Route::get('/customer/leger/{legerid}', [CustomerController::class, 'customerLeger']);
+
+Route::get('/customer/list/copy', [CustomerController::class, 'customerListcopy']);

@@ -242,6 +242,7 @@ class ReportController extends Controller
 
     public function fetchReceipts(Request $request)
     {
+        $user = Auth::user();
         $query = Receipt::join('invoices', 'receipts.bill_id', '=', 'invoices.id')
             ->join('users', 'invoices.assign', '=', 'users.id')
             ->join('customers', 'invoices.customer', '=', 'customers.id')
@@ -252,6 +253,11 @@ class ReportController extends Controller
                 'users.full_name as assign_name'
             )
             ->orderBy('receipts.date', 'desc'); // Order by date descending
+        if ($user->role === 'admin') {
+            $query->where('receipts.status', 'inactive');
+        } else {
+            $query->where('receipts.manager_status', 'inactive');
+        }
 
         // Apply Start and End Date Filters
         if ($request->start_date && $request->end_date) {

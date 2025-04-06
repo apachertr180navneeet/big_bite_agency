@@ -256,7 +256,7 @@ class CustomerController extends Controller
         unset($entry); // Break reference
 
         // Calculate the total due
-        $totalDue = $totalInvoice - $totalReceipt;
+        $totalDue = abs($totalInvoice - $totalReceipt);
 
         // Pass the ledger data and totals to the view
         return view('admin.customer.leger', compact('ledgerData', 'totalInvoice', 'totalReceipt', 'totalDue', 'customerDetail'));

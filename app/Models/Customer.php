@@ -30,6 +30,7 @@ class Customer extends Model
         'state',
         'discount',
         'status',
+        'customer_id',
     ];
 
     // Enable date casting for timestamps and soft deletes

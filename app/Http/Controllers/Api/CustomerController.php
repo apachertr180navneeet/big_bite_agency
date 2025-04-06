@@ -18,77 +18,165 @@ use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
 {
+    // public function customerListcopy(Request $request)
+    // {
+    //     try {
+    //         // Get the authenticated user's ID
+    //         $id = auth()->user()->id;
+
+    //         // Define pagination parameters (items per page)
+    //         $perPage = 10;
+
+    //         // Fetch invoices with the necessary joins and conditions
+    //         $invoices = Invoice::where('invoices.assign', $id)
+    //             //->where('invoices.payment', 'pending') // Only 'pending' invoices
+    //             ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
+    //             ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
+    //             ->select(
+    //                 'customers.id as customer_id',
+    //                 'customers.firm as customers_name',
+    //                 'customers.city as customers_city',
+    //                 'customers.phone as customers_phone',
+    //                 DB::raw('COUNT(invoices.id) as total_invoices'), // Total invoices count
+    //                 DB::raw('SUM(invoices.amount) as total_invoice_amount') // Total invoice amount
+    //             )
+    //             ->groupBy('customers.id', 'customers.name', 'customers.city', 'customers.phone') // Group by customer
+    //             ->paginate($perPage);
+                
+    //         // Calculate the due amount for each customer
+    //         $invoiceData = $invoices->map(function ($invoice) {
+    //             // Fetch total receipts for this customer
+    //             $receiptData = Receipt::whereHas('invoice', function ($query) use ($invoice) {
+    //                 $query->where('customer', $invoice->customer_id);
+    //             })->selectRaw('SUM(amount + IFNULL(discount, 0)) as total_receipts')
+    //             ->first();
+
+    //             $totalReceipts = $receiptData->total_receipts ?? 0;
+
+    //             return [
+    //                 'customer_id' => $invoice->customer_id,
+    //                 'customers_name' => $invoice->customers_name,
+    //                 'customers_city' => $invoice->customers_city,
+    //                 'customers_phone' => $invoice->customers_phone,
+    //                 'total_bill' => $invoice->total_invoices,
+    //                 'due' => $invoice->total_invoice_amount - $totalReceipts,
+    //             ];
+    //         });
+
+    //         // Return the response with the customer data and pagination details
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Customers found successfully.',
+    //             'customer' => $invoiceData,
+    //             'pagination' => [
+    //                 'current_page' => $invoices->currentPage(),
+    //                 'total_pages' => $invoices->lastPage(),
+    //                 'total_items' => $invoices->total(),
+    //                 'items_per_page' => $invoices->perPage(),
+    //                 'current_url' => $invoices->url($invoices->currentPage()),
+    //                 'last_url' => $invoices->url($invoices->lastPage()),
+    //                 'previous_url' => $invoices->previousPageUrl(),
+    //                 'next_url' => $invoices->nextPageUrl(),
+    //                 'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : null,
+    //             ],
+    //         ], 200);
+
+    //     } catch (Exception $e) {
+    //         // Return a response with error details in case of any exception
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'An error occurred: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function customerList(Request $request)
     {
         try {
-            // Get the authenticated user's ID
-            $id = auth()->user()->id;
+            // For now, using a fixed user ID (replace with auth()->id() if needed)
+            $userId = auth()->user()->id;
+            $perPage = 1000;
 
-            // Define pagination parameters (items per page)
-            $perPage = 10;
-
-            // Fetch invoices with the necessary joins and conditions
-            $invoices = Invoice::where('invoices.assign', $id)
-                //->where('invoices.payment', 'pending') // Only 'pending' invoices
-                ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
-                ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
+            // Fetch paginated grouped invoices with customer info
+            $invoices = Invoice::where('invoices.assign', $userId)
+                //->where('invoices.payment', 'pending') // Uncomment if needed
+                ->join('users', 'invoices.assign', '=', 'users.id')
+                ->join('customers', 'invoices.customer', '=', 'customers.id')
                 ->select(
                     'customers.id as customer_id',
                     'customers.firm as customers_name',
                     'customers.city as customers_city',
                     'customers.phone as customers_phone',
-                    DB::raw('COUNT(invoices.id) as total_invoices'), // Total invoices count
-                    DB::raw('SUM(invoices.amount) as total_invoice_amount') // Total invoice amount
+                    DB::raw('COUNT(invoices.id) as total_invoices'),
+                    DB::raw('SUM(invoices.amount) as total_invoice_amount'),
+                    DB::raw("GROUP_CONCAT(invoices.id ORDER BY invoices.id ASC) as invoice_ids")
                 )
-                ->groupBy('customers.id', 'customers.name', 'customers.city', 'customers.phone') // Group by customer
+                ->groupBy('customers.id', 'customers.firm', 'customers.city', 'customers.phone')
                 ->paginate($perPage);
-                
-            // Calculate the due amount for each customer
-            $invoiceData = $invoices->map(function ($invoice) {
-                // Fetch total receipts for this customer
-                $receiptData = Receipt::whereHas('invoice', function ($query) use ($invoice) {
-                    $query->where('customer', $invoice->customer_id);
-                })->selectRaw('SUM(amount + IFNULL(discount, 0)) as total_receipts')
-                ->first();
 
-                $totalReceipts = $receiptData->total_receipts ?? 0;
+            // Initialize result array
+            $invoiceData = [];
 
-                return [
-                    'customer_id' => $invoice->customer_id,
-                    'customers_name' => $invoice->customers_name,
-                    'customers_city' => $invoice->customers_city,
-                    'customers_phone' => $invoice->customers_phone,
-                    'total_bill' => $invoice->total_invoices,
-                    'due' => $invoice->total_invoice_amount - $totalReceipts,
+            // Loop over each customer group
+            foreach ($invoices as $group) {
+                $invoiceIds = explode(',', $group->invoice_ids);
+
+                // Get total receipts and discounts for all invoice IDs in one query
+                $receipts = Receipt::whereIn('bill_id', $invoiceIds)
+                    ->select(
+                        DB::raw('SUM(amount) as total_receipt'),
+                        DB::raw('SUM(discount) as total_discount')
+                    )
+                    ->first();
+
+                $totalReceipts = $receipts->total_receipt ?? 0;
+                $totalDiscounts = $receipts->total_discount ?? 0;
+
+                // Calculate due and append data
+                $dueAmount = $group->total_invoice_amount - ($totalReceipts + $totalDiscounts);
+
+                $invoiceData[] = [
+                    'customer_id'     => $group->customer_id,
+                    'customers_name'  => $group->customers_name,
+                    'customers_city'  => $group->customers_city,
+                    'customers_phone' => $group->customers_phone,
+                    'total_bill'      => $group->total_invoice_amount,
+                    'due'             => $dueAmount,
                 ];
-            });
+            }
 
-            // Return the response with the customer data and pagination details
+            // ✅ Sort by due amount in descending order (highest dues first)
+            $invoiceData = collect($invoiceData)->sortByDesc('due')->values()->all();
+
+            // Final API response
             return response()->json([
                 'status' => true,
                 'message' => 'Customers found successfully.',
                 'customer' => $invoiceData,
                 'pagination' => [
-                    'current_page' => $invoices->currentPage(),
-                    'total_pages' => $invoices->lastPage(),
-                    'total_items' => $invoices->total(),
+                    'current_page'   => $invoices->currentPage(),
+                    'total_pages'    => $invoices->lastPage(),
+                    'total_items'    => $invoices->total(),
                     'items_per_page' => $invoices->perPage(),
-                    'current_url' => $invoices->url($invoices->currentPage()),
-                    'last_url' => $invoices->url($invoices->lastPage()),
-                    'previous_url' => $invoices->previousPageUrl(),
-                    'next_url' => $invoices->nextPageUrl(),
-                    'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : null,
+                    'current_url'    => $invoices->url($invoices->currentPage()),
+                    'last_url'       => $invoices->url($invoices->lastPage()),
+                    'previous_url'   => $invoices->previousPageUrl(),
+                    'next_url'       => $invoices->nextPageUrl(),
+                    'next_page'      => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : null,
                 ],
             ], 200);
 
-        } catch (Exception $e) {
-            // Return a response with error details in case of any exception
+        } catch (\Exception $e) {
+            // Catch and return any error
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred: ' . $e->getMessage(),
             ], 500);
         }
     }
+
+
 
 
     public function customerSearch(Request $request)
@@ -326,6 +414,8 @@ class CustomerController extends Controller
             $user = Auth::user();
             $lastReceipt = Receipt::latest('id')->first();
 
+            $invoice = Invoice::find($request->bill_id);
+
             if($lastReceipt){
                 $newReceipt = sprintf('%04d', intval($lastReceipt->receipt) + 1);
 
@@ -339,6 +429,7 @@ class CustomerController extends Controller
                 'date' => $request->date,
                 'receipt' => $newReceipt,
                 'bill_id' => $request->bill_id,
+                'customer_id' => $invoice->customer,
                 'assign' => $id,
                 'amount' => $request->amount,
                 'discount' => $request->discount,
@@ -349,7 +440,6 @@ class CustomerController extends Controller
             ];
             $receipt = Receipt::create($dataUser);
 
-            $invoice = Invoice::find($request->bill_id);
 
             $customer = Customer::find($invoice->customer);
 
@@ -462,46 +552,43 @@ class CustomerController extends Controller
             ];
 
             // Fetch all invoices for the customer
-            $invoiceLists = Invoice::where('customer', $ledgerId)
-                //->where('invoices.payment', 'pending')
-                ->get();
+            $invoiceLists = Invoice::where('customer', $ledgerId)->get();
 
-            $ledgerData = []; // To store merged and sorted data
-            $totalInvoice = 0; // Total invoice amount
-            $totalReceipt = 0; // Total receipt amount
+            $ledgerData = collect(); // Collection for merged data
+            $totalInvoice = 0;
+            $totalReceipt = 0;
 
             // Process invoices and related receipts
             foreach ($invoiceLists as $invoice) {
-                // Add invoice entry to ledger data
-                $ledgerData[] = [
+                $ledgerData->push([
                     'date' => Carbon::parse($invoice->date)->format('d/m/Y'),
                     'description' => "Sales Invoice " . $invoice->invoice,
                     'bill' => $invoice->amount,
-                    'receipt' => '0',
-                    'discount' => '0',
-                ];
+                    'receipt' => 0,
+                    'discount' => 0,
+                ]);
 
-                $totalInvoice += $invoice->amount; // Increment total invoice amount
+                $totalInvoice += $invoice->amount;
 
-                // Fetch all receipts linked to the invoice
+                // Fetch receipts linked to the invoice
                 $receiptLists = Receipt::where('bill_id', $invoice->id)->get();
                 foreach ($receiptLists as $receipt) {
-                    $ledgerData[] = [
+                    $ledgerData->push([
                         'date' => Carbon::parse($receipt->date)->format('d/m/Y'),
-                        'description' => "Recepit Voucher " . $receipt->receipt,
-                        'bill' => '0',
+                        'description' => "Receipt Voucher " . $receipt->receipt,
+                        'bill' => 0,
                         'receipt' => $receipt->amount,
                         'discount' => $receipt->discount,
-                    ];
+                    ]);
 
-                    $totalReceipt += $receipt->amount + $receipt->discount; // Increment total receipt amount
+                    $totalReceipt += $receipt->amount + $receipt->discount;
                 }
             }
 
-            // Sort ledger data by date
-            usort($ledgerData, function ($a, $b) {
-                return strtotime($a['date']) - strtotime($b['date']);
-            });
+            // Sort ledger data by date in descending order
+            $ledgerData = $ledgerData->sortByDesc(function ($entry) {
+                return Carbon::createFromFormat('d/m/Y', $entry['date'])->timestamp;
+            })->values(); // Reset keys after sorting
 
             // Calculate total due
             $totalDue = $totalInvoice - $totalReceipt;
@@ -530,12 +617,12 @@ class CustomerController extends Controller
                 'pdf_url' => $pdfUrl,
             ]);
         } catch (\Exception $e) {
-            // Handle exceptions and return error response
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred: ' . $e->getMessage(),
             ], 500);
         }
     }
+
 
 }
