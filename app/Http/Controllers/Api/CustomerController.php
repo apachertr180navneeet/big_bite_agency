@@ -179,40 +179,132 @@ class CustomerController extends Controller
 
 
 
+    // public function customerSearch(Request $request)
+    // {
+    //     try {
+    //         // Get the authenticated user's ID
+    //         $id = auth()->user()->id;
+
+    //         // Define pagination parameters (items per page)
+    //         $perPage = 10;
+
+    //         // Initialize the query for invoices
+    //         $query = Invoice::where('invoices.assign', $id)
+    //             //->where('invoices.payment', 'pending') // Only 'pending' invoices
+    //             ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
+    //             ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
+    //             ->select(
+    //                 'customers.id as customer_id',
+    //                 'customers.firm as customers_name',
+    //                 'customers.city as customers_city',
+    //                 'customers.phone as customers_phone',
+    //                 DB::raw('COUNT(invoices.id) as total_invoices'), // Total invoices count
+    //                 DB::raw('SUM(invoices.amount) as total_invoice_amount') // Total invoice amount
+    //             )
+    //             ->groupBy('customers.id', 'customers.name', 'customers.city', 'customers.phone'); // Group by customer
+
+    //         // Apply search filters for name, phone, and city if provided
+    //             $query->Where('customers.name', 'like', '%' . $request->name . '%');
+    //             $query->orWhere('customers.phone', 'like', '%' . $request->name . '%');
+    //             $query->orWhere('customers.city', 'like', '%' . $request->name . '%');
+            
+
+    //         // Paginate the results
+    //         $invoices = $query->paginate($perPage);
+
+    //         // If no invoices are found, return a 'Customer not found' response
+    //         if ($invoices->isEmpty()) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Customer not found.',
+    //             ], 200);
+    //         }
+
+    //         // Map the invoice data to a simpler structure for the response
+    //         $invoiceData = $invoices->map(function ($invoice) {
+    //             // Fetch total receipts for this customer
+    //             $receiptData = Receipt::whereHas('invoice', function ($query) use ($invoice) {
+    //                 $query->where('customer', $invoice->customer_id);
+    //             })->selectRaw('SUM(amount + IFNULL(discount, 0)) as total_receipts')
+    //             ->first();
+
+    //             $totalReceipts = $receiptData->total_receipts ?? 0;
+
+    //             return [
+    //                 'customer_id' => $invoice->customer_id,
+    //                 'customers_name' => $invoice->customers_name,
+    //                 'customers_city' => $invoice->customers_city,
+    //                 'customers_phone' => $invoice->customers_phone,
+    //                 'total_bill' => $invoice->total_invoices,
+    //                 'due' => $invoice->total_invoice_amount - $totalReceipts,
+    //             ];
+    //         });
+
+    //         // Return the response with the customer data and pagination details
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Customers found successfully.',
+    //             'customer' => $invoiceData, // Customer data (transformed)
+    //             'pagination' => [
+    //                 'current_page' => $invoices->currentPage(),
+    //                 'total_pages' => $invoices->lastPage(),
+    //                 'total_items' => $invoices->total(),
+    //                 'items_per_page' => $invoices->perPage(),
+    //                 'current_url' => $invoices->url($invoices->currentPage()),
+    //                 'last_url' => $invoices->url($invoices->lastPage()),
+    //                 'previous_url' => $invoices->previousPageUrl(),
+    //                 'next_url' => $invoices->nextPageUrl(),
+    //                 'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : null,
+    //             ],
+    //         ], 200);
+    //     } catch (Exception $e) {
+    //         // Return a response with error details in case of any exception
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'An error occurred: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function customerSearch(Request $request)
     {
         try {
-            // Get the authenticated user's ID
-            $id = auth()->user()->id;
+            // Get authenticated user's ID
+            $userId = auth()->user()->id;
 
-            // Define pagination parameters (items per page)
+            // Pagination count
             $perPage = 10;
 
-            // Initialize the query for invoices
-            $query = Invoice::where('invoices.assign', $id)
-                //->where('invoices.payment', 'pending') // Only 'pending' invoices
-                ->join('users', 'invoices.assign', '=', 'users.id') // Join with 'users' table
-                ->join('customers', 'invoices.customer', '=', 'customers.id') // Join with 'customers' table
+            // Start building the grouped invoice query with joins
+            $query = Invoice::where('invoices.assign', $userId)
+                //->where('invoices.payment', 'pending') // Uncomment if needed
+                ->join('users', 'invoices.assign', '=', 'users.id')
+                ->join('customers', 'invoices.customer', '=', 'customers.id')
                 ->select(
                     'customers.id as customer_id',
                     'customers.firm as customers_name',
                     'customers.city as customers_city',
                     'customers.phone as customers_phone',
-                    DB::raw('COUNT(invoices.id) as total_invoices'), // Total invoices count
-                    DB::raw('SUM(invoices.amount) as total_invoice_amount') // Total invoice amount
+                    DB::raw('COUNT(invoices.id) as total_invoices'),
+                    DB::raw('SUM(invoices.amount) as total_invoice_amount'),
+                    DB::raw("GROUP_CONCAT(invoices.id ORDER BY invoices.id ASC) as invoice_ids")
                 )
-                ->groupBy('customers.id', 'customers.name', 'customers.city', 'customers.phone'); // Group by customer
+                ->groupBy('customers.id', 'customers.firm', 'customers.city', 'customers.phone');
 
-            // Apply search filters for name, phone, and city if provided
-                $query->Where('customers.name', 'like', '%' . $request->name . '%');
-                $query->orWhere('customers.phone', 'like', '%' . $request->name . '%');
-                $query->orWhere('customers.city', 'like', '%' . $request->name . '%');
-            
+            // Apply search filter if request has name/phone/city
+            if ($request->filled('name')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('customers.firm', 'like', '%' . $request->name . '%')
+                    ->orWhere('customers.phone', 'like', '%' . $request->name . '%')
+                    ->orWhere('customers.city', 'like', '%' . $request->name . '%');
+                });
+            }
 
-            // Paginate the results
+            // Get paginated result
             $invoices = $query->paginate($perPage);
 
-            // If no invoices are found, return a 'Customer not found' response
+            // If no data found
             if ($invoices->isEmpty()) {
                 return response()->json([
                     'status' => false,
@@ -220,31 +312,40 @@ class CustomerController extends Controller
                 ], 200);
             }
 
-            // Map the invoice data to a simpler structure for the response
-            $invoiceData = $invoices->map(function ($invoice) {
-                // Fetch total receipts for this customer
-                $receiptData = Receipt::whereHas('invoice', function ($query) use ($invoice) {
-                    $query->where('customer', $invoice->customer_id);
-                })->selectRaw('SUM(amount + IFNULL(discount, 0)) as total_receipts')
-                ->first();
+            // Loop through invoice groups and calculate dues
+            $invoiceData = [];
+            foreach ($invoices as $group) {
+                $invoiceIds = explode(',', $group->invoice_ids);
 
-                $totalReceipts = $receiptData->total_receipts ?? 0;
+                $receipts = Receipt::whereIn('bill_id', $invoiceIds)
+                    ->select(
+                        DB::raw('SUM(amount) as total_receipt'),
+                        DB::raw('SUM(discount) as total_discount')
+                    )
+                    ->first();
 
-                return [
-                    'customer_id' => $invoice->customer_id,
-                    'customers_name' => $invoice->customers_name,
-                    'customers_city' => $invoice->customers_city,
-                    'customers_phone' => $invoice->customers_phone,
-                    'total_bill' => $invoice->total_invoices,
-                    'due' => $invoice->total_invoice_amount - $totalReceipts,
+                $totalReceipts = $receipts->total_receipt ?? 0;
+                $totalDiscounts = $receipts->total_discount ?? 0;
+                $dueAmount = $group->total_invoice_amount - ($totalReceipts + $totalDiscounts);
+
+                $invoiceData[] = [
+                    'customer_id'     => $group->customer_id,
+                    'customers_name'  => $group->customers_name,
+                    'customers_city'  => $group->customers_city,
+                    'customers_phone' => $group->customers_phone,
+                    'total_bill'      => $group->total_invoice_amount,
+                    'due'             => $dueAmount,
                 ];
-            });
+            }
 
-            // Return the response with the customer data and pagination details
+            // Sort by due descending
+            $sortedInvoiceData = collect($invoiceData)->sortByDesc('due')->values()->all();
+
+            // Return response
             return response()->json([
                 'status' => true,
                 'message' => 'Customers found successfully.',
-                'customer' => $invoiceData, // Customer data (transformed)
+                'customer' => $sortedInvoiceData,
                 'pagination' => [
                     'current_page' => $invoices->currentPage(),
                     'total_pages' => $invoices->lastPage(),
@@ -257,14 +358,14 @@ class CustomerController extends Controller
                     'next_page' => $invoices->hasMorePages() ? $invoices->currentPage() + 1 : null,
                 ],
             ], 200);
-        } catch (Exception $e) {
-            // Return a response with error details in case of any exception
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'An error occurred: ' . $e->getMessage(),
             ], 500);
         }
     }
+
 
 
     public function customerReceipt(Request $request)
